@@ -1,0 +1,61 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PluginBadge from '../../components/PluginBadge.astro';
+import InstallCommand from '../../components/InstallCommand.astro';
+import { site } from '../../site.config';
+
+export async function getStaticPaths() {
+  const skills = await getCollection('skills');
+  return skills.map((skill) => ({ params: { slug: skill.id }, props: { skill } }));
+}
+
+const { skill } = Astro.props;
+
+// Instala só esta skill. --full-depth porque as skills ficam aninhadas em plugins/*/skills/*.
+const installCommand = `npx skills add ${site.repo.slug}@${skill.data.name} --full-depth`;
+
+let Content: Awaited<ReturnType<typeof render>>['Content'] | null = null;
+if (skill.data.hasDoc) {
+  Content = (await render(skill)).Content;
+}
+---
+<Base title={skill.data.name} description={skill.data.blurb || skill.data.description}>
+  <div data-pagefind-body>
+    <nav class="mb-4 text-sm text-zinc-500">
+      <a href="/" class="hover:text-brand-600 dark:hover:text-brand-300">Skills</a>
+      <span class="mx-1">/</span>
+      <span data-pagefind-meta="plugin">{skill.data.plugin.id}</span>
+    </nav>
+
+    <header class="mb-6">
+      <div class="mb-3 flex flex-wrap items-center gap-2">
+        <PluginBadge plugin={skill.data.plugin.id} href={`/plugins/${skill.data.plugin.id}`} />
+        {!skill.data.hasDoc && (
+          <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+            sem documentação
+          </span>
+        )}
+      </div>
+      <h1 class="font-mono text-2xl font-bold tracking-tight sm:text-3xl" data-pagefind-meta="title">
+        {skill.data.name}
+      </h1>
+    </header>
+
+    <div class="mb-8 rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
+      <p class="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">Instalar esta skill:</p>
+      <InstallCommand command={installCommand} />
+    </div>
+
+    {skill.data.hasDoc && Content ? (
+      <article class="prose"><Content /></article>
+    ) : (
+      <div class="rounded-lg border border-dashed border-amber-300 bg-amber-50 p-6 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/5 dark:text-amber-300">
+        <p class="font-medium">Documentação ainda não disponível.</p>
+        <p class="mt-1 text-sm">
+          O mantenedor deve criar <code class="font-mono">plugins/{skill.data.plugin.id}/docs/{skill.id}.md</code> para documentar esta skill.
+        </p>
+      </div>
+    )}
+  </div>
+</Base>

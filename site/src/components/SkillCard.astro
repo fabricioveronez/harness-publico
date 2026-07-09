@@ -1,0 +1,58 @@
+---
+import PluginBadge from './PluginBadge.astro';
+
+interface Props {
+  id: string;
+  name: string;
+  plugin: string;
+  blurb: string;
+  hasDoc: boolean;
+  row?: boolean;
+}
+const { id, name, plugin, blurb, hasDoc, row = false } = Astro.props;
+const text = hasDoc ? blurb : 'Documentação ainda não disponível para esta skill.';
+const pendingBadge = `inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400`;
+---
+{
+  row ? (
+    <article
+      data-plugin={plugin}
+      class="group relative -mx-3 flex flex-col gap-1 rounded-md border-b border-zinc-200 px-3 py-4 transition last:border-b-0 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900/50"
+    >
+      <div class="flex flex-wrap items-center gap-2">
+        <h3 class="font-mono text-base font-semibold tracking-tight">
+          <a
+            href={`/skills/${id}`}
+            class="after:absolute after:inset-0 group-hover:text-brand-600 dark:group-hover:text-brand-300"
+          >
+            {name}
+          </a>
+        </h3>
+        <div class="relative z-10 flex items-center gap-2">
+          <PluginBadge plugin={plugin} href={`/plugins/${plugin}`} />
+          {!hasDoc && <span class={pendingBadge}>sem documentação</span>}
+        </div>
+      </div>
+      <p class="line-clamp-2 text-sm text-zinc-600 dark:text-zinc-400">{text}</p>
+    </article>
+  ) : (
+    <article
+      data-plugin={plugin}
+      class="group relative flex flex-col rounded-xl border border-zinc-200 bg-white p-5 transition hover:border-brand-300 hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+    >
+      <div class="relative z-10 mb-2 flex items-center justify-between gap-2">
+        <PluginBadge plugin={plugin} href={`/plugins/${plugin}`} />
+        {!hasDoc && <span class={pendingBadge}>sem documentação</span>}
+      </div>
+      <h3 class="font-mono text-base font-semibold tracking-tight">
+        <a
+          href={`/skills/${id}`}
+          class="after:absolute after:inset-0 group-hover:text-brand-600 dark:group-hover:text-brand-300"
+        >
+          {name}
+        </a>
+      </h3>
+      <p class="mt-2 line-clamp-4 text-sm text-zinc-600 dark:text-zinc-400">{text}</p>
+    </article>
+  )
+}

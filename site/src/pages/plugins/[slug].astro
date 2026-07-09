@@ -1,0 +1,51 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import SkillCard from '../../components/SkillCard.astro';
+import InstallCommand from '../../components/InstallCommand.astro';
+
+export async function getStaticPaths() {
+  const plugins = await getCollection('plugins');
+  const skills = await getCollection('skills');
+  return plugins.map((plugin) => ({
+    params: { slug: plugin.id },
+    props: {
+      plugin,
+      skills: skills
+        .filter((s) => s.data.plugin.id === plugin.id)
+        .sort((a, b) => a.data.name.localeCompare(b.data.name)),
+    },
+  }));
+}
+
+const { plugin, skills } = Astro.props;
+---
+<Base title={plugin.data.name} description={plugin.data.description}>
+  <nav class="mb-4 text-sm text-zinc-500">
+    <a href="/" class="hover:text-brand-600 dark:hover:text-brand-300">Skills</a>
+    <span class="mx-1">/</span>
+    <span>plugins</span>
+  </nav>
+
+  <header class="mb-6">
+    <div class="flex items-baseline gap-3">
+      <h1 class="font-mono text-2xl font-bold tracking-tight sm:text-3xl">{plugin.data.name}</h1>
+      {plugin.data.version && (
+        <span class="text-sm text-zinc-500">v{plugin.data.version}</span>
+      )}
+    </div>
+    <p class="mt-2 max-w-2xl text-zinc-600 dark:text-zinc-400">{plugin.data.description}</p>
+  </header>
+
+  <div class="mb-8 rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
+    <p class="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">Instalar este plugin:</p>
+    <InstallCommand command={plugin.data.installCommand} />
+  </div>
+
+  <h2 class="mb-4 text-lg font-semibold">Skills ({skills.length})</h2>
+  <div id="skill-grid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {skills.map((s) => (
+      <SkillCard id={s.id} name={s.data.name} plugin={s.data.plugin.id} blurb={s.data.blurb} hasDoc={s.data.hasDoc} />
+    ))}
+  </div>
+</Base>

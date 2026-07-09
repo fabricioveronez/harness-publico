@@ -1,0 +1,32 @@
+---
+interface Props {
+  command: string;
+  label?: string;
+}
+const { command, label = 'Instalar' } = Astro.props;
+---
+<div class="flex items-center gap-2">
+  <code
+    class="flex-1 overflow-x-auto rounded-md bg-zinc-900 px-3 py-2 font-mono text-sm text-zinc-100 dark:bg-black/40"
+    >{command}</code
+  >
+  <button
+    type="button"
+    class="install-copy shrink-0 rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+    data-command={command}
+    aria-label={label}
+  >
+    Copiar
+  </button>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.install-copy').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(btn.dataset.command ?? '');
+      const original = btn.textContent;
+      btn.textContent = 'Copiado!';
+      setTimeout(() => (btn.textContent = original), 1500);
+    });
+  });
+</script>

@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+/* Tokens de tema (Tailwind 4). Reskin de paleta/tipografia mora aqui — a outra
+   metade do reskin é o src/site.config.ts (branding/taxonomia). */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "Menlo", monospace;
+
+  --color-brand-50: oklch(0.97 0.02 265);
+  --color-brand-100: oklch(0.93 0.05 265);
+  --color-brand-300: oklch(0.78 0.13 265);
+  --color-brand-500: oklch(0.58 0.20 265);
+  --color-brand-600: oklch(0.50 0.20 265);
+  --color-brand-700: oklch(0.43 0.17 265);
+}
+
+/* Suporte a light/dark via classe no <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light dark;
+}
+
+/* Estilo do markdown renderizado dos docs (sem @tailwindcss/typography). */
+.prose {
+  line-height: 1.7;
+  color: var(--color-zinc-700);
+}
+.dark .prose {
+  color: var(--color-zinc-300);
+}
+.prose h1 { font-size: 1.6rem; font-weight: 700; margin: 1.6rem 0 0.8rem; letter-spacing: -0.01em; }
+.prose h2 { font-size: 1.3rem; font-weight: 600; margin: 1.8rem 0 0.6rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--color-zinc-200); }
+.dark .prose h2 { border-color: var(--color-zinc-800); }
+.prose h3 { font-size: 1.1rem; font-weight: 600; margin: 1.2rem 0 0.4rem; }
+.prose p { margin: 0.8rem 0; }
+.prose ul, .prose ol { margin: 0.8rem 0; padding-left: 1.4rem; }
+.prose ul { list-style: disc; }
+.prose ol { list-style: decimal; }
+.prose li { margin: 0.3rem 0; }
+.prose a { color: var(--color-brand-600); text-decoration: underline; text-underline-offset: 2px; }
+.dark .prose a { color: var(--color-brand-300); }
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--color-zinc-100);
+  padding: 0.15em 0.4em;
+  border-radius: 0.3rem;
+}
+.dark .prose code { background: var(--color-zinc-800); }
+.prose pre {
+  background: var(--color-zinc-900);
+  color: var(--color-zinc-100);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+.prose pre code { background: transparent; padding: 0; }
+.prose table { width: 100%; border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; }
+.prose th, .prose td { border: 1px solid var(--color-zinc-200); padding: 0.5rem 0.75rem; text-align: left; }
+.dark .prose th, .dark .prose td { border-color: var(--color-zinc-800); }
+.prose blockquote { border-left: 3px solid var(--color-brand-300); padding-left: 1rem; color: var(--color-zinc-500); margin: 1rem 0; }
+.prose img { max-width: 100%; height: auto; border-radius: 0.5rem; }

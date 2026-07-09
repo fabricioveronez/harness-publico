@@ -1,0 +1,6 @@
+{
+  "name": "devops",
+  "version": "1.0.0",
+  "description": "Docker, Kubernetes, Terraform, GitHub Actions, runbooks",
+  "author": { "name": "Fabricio Veronez", "email": "fabricio@veronez.io" }
+}

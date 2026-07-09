@@ -1,0 +1,68 @@
+---
+import '../styles/theme.css';
+import { site } from '../site.config';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = site.description } = Astro.props;
+const fullTitle = title ? `${title} · ${site.name}` : `${site.name} — ${site.tagline}`;
+---
+
+<!doctype html>
+<html lang="pt-BR" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{fullTitle}</title>
+    {/* Evita flash de tema: aplica preferência salva antes da pintura. */}
+    <script is:inline>
+      (() => {
+        const saved = localStorage.getItem('theme');
+        const dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.toggle('dark', dark);
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen bg-white text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
+    <header class="sticky top-0 z-20 border-b border-zinc-200/70 bg-white/80 backdrop-blur dark:border-zinc-800/70 dark:bg-zinc-950/80">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <a href="/" class="flex items-center gap-2 font-semibold tracking-tight">
+          <img src={site.logo} alt={site.name} class="h-7 w-7 rounded-md" />
+          {site.name}
+        </a>
+        <button
+          id="theme-toggle"
+          type="button"
+          aria-label="Alternar tema"
+          class="rounded-md border border-zinc-200 px-2 py-1 text-sm text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+        >
+          <span class="hidden dark:inline">☀︎</span>
+          <span class="inline dark:hidden">☾</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 py-8">
+      <slot />
+    </main>
+
+    <footer class="mt-16 border-t border-zinc-200 py-8 text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+      <div class="mx-auto max-w-6xl px-4">
+        <p>{site.name} · por {site.author.name}</p>
+        <p class="mt-1">
+          Instalar todas as skills: <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs dark:bg-zinc-800">{site.repo.installAll}</code>
+        </p>
+      </div>
+    </footer>
+
+    <script is:inline>
+      document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        const dark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+      });
+    </script>
+  </body>
+</html>

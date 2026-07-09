@@ -1,0 +1,8 @@
+{
+  "name": "fabricio-marketplace-publico",
+  "owner": { "name": "Fabricio Veronez", "email": "fabricio@veronez.io" },
+  "plugins": [
+    { "name": "desenvolvimento-de-sistemas", "source": "./plugins/desenvolvimento-de-sistemas", "description": "PRDs, TRDs, planos, testes, bootstrap, boas práticas" },
+    { "name": "devops",                      "source": "./plugins/devops",                      "description": "Docker, Kubernetes, Terraform, GitHub Actions, runbooks" }
+  ]
+}

@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# macOS metadata
+.DS_Store
+
+# Windows / NTFS metadata
+*:Zone.Identifier
+
+# Obsidian workspace (estado local do editor)
+.obsidian/
+
+# Artefatos de trabalho das skills (playwright, workspaces)
+.playwright-cli/
+**/skills/*-workspace/

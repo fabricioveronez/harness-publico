@@ -1,0 +1,50 @@
+---
+interface Props {
+  plugins: { name: string; count: number }[];
+  total: number;
+}
+const { plugins, total } = Astro.props;
+const item =
+  'filter-btn flex w-full items-center justify-between gap-2 rounded-md px-3 py-1.5 text-left text-sm transition text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800';
+---
+<aside class="md:w-60 md:shrink-0">
+  <div class="md:sticky md:top-16">
+    <p class="mb-2 px-3 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">Categorias</p>
+    <nav data-filter-bar class="space-y-0.5">
+      <button type="button" data-filter="all" class={`${item} is-active`}>
+        <span>Todas</span>
+        <span class="filter-count text-xs opacity-60">{total}</span>
+      </button>
+      {plugins.map((p) => (
+        <button type="button" data-filter={p.name} class={item}>
+          <span class="truncate">{p.name}</span>
+          <span class="filter-count text-xs opacity-60">{p.count}</span>
+        </button>
+      ))}
+    </nav>
+  </div>
+</aside>
+
+<style>
+  .filter-btn.is-active {
+    background: var(--color-brand-500);
+    color: white;
+  }
+  .filter-btn.is-active .filter-count {
+    opacity: 0.85;
+  }
+</style>
+
+<script>
+  const bar = document.querySelector('[data-filter-bar]');
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('#skill-list > [data-plugin]'));
+  bar?.addEventListener('click', (e) => {
+    const target = (e.target as HTMLElement).closest<HTMLButtonElement>('.filter-btn');
+    if (!target) return;
+    const filter = target.dataset.filter;
+    bar.querySelectorAll('.filter-btn').forEach((b) => b.classList.toggle('is-active', b === target));
+    for (const card of cards) {
+      card.style.display = filter === 'all' || card.dataset.plugin === filter ? '' : 'none';
+    }
+  });
+</script>
