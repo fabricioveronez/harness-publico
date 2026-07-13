@@ -1,6 +1,6 @@
 {
   "name": "desenvolvimento-de-sistemas",
   "version": "1.0.0",
-  "description": "PRDs, TRDs, planos, testes, bootstrap, boas práticas",
+  "description": "Boas práticas (Python/TypeScript), bootstrap Next.js e testes (unit/E2E)",
   "author": { "name": "Fabricio Veronez", "email": "fabricio@veronez.io" }
 }

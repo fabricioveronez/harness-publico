@@ -2,7 +2,8 @@
   "name": "fabricio-marketplace-publico",
   "owner": { "name": "Fabricio Veronez", "email": "fabricio@veronez.io" },
   "plugins": [
-    { "name": "desenvolvimento-de-sistemas", "source": "./plugins/desenvolvimento-de-sistemas", "description": "PRDs, TRDs, planos, testes, bootstrap, boas práticas" },
+    { "name": "spec-driven-development",     "source": "./plugins/spec-driven-development",     "description": "Fluxo spec-driven para software: PRD, TRD, revisão, plano/tasks e implementação" },
+    { "name": "desenvolvimento-de-sistemas", "source": "./plugins/desenvolvimento-de-sistemas", "description": "Boas práticas (Python/TypeScript), bootstrap Next.js e testes (unit/E2E)" },
     { "name": "devops",                      "source": "./plugins/devops",                      "description": "Docker, Kubernetes, Terraform, GitHub Actions, runbooks" }
   ]
 }

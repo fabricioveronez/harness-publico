@@ -23,7 +23,8 @@ npx skills add fabricioveronez/harness-publico@docker-practices --full-depth
 
 | Plugin | Descrição |
 |--------|-----------|
-| `desenvolvimento-de-sistemas` | PRDs, TRDs, planos, testes, bootstrap, boas práticas |
+| `spec-driven-development`     | Fluxo spec-driven para software: PRD, TRD, revisão, plano/tasks e implementação |
+| `desenvolvimento-de-sistemas` | Boas práticas (Python/TypeScript), bootstrap Next.js e testes (unit/E2E) |
 | `devops`                      | Docker, Kubernetes, Terraform, GitHub Actions, runbooks |
 
 ## Estrutura

@@ -1,0 +1,6 @@
+{
+  "name": "spec-driven-development",
+  "version": "1.0.0",
+  "description": "Fluxo spec-driven para software: PRD, TRD, revisão, plano/tasks e implementação",
+  "author": { "name": "Fabricio Veronez", "email": "fabricio@veronez.io" }
+}
