@@ -1,14 +1,20 @@
 # Template TASKS.md
 
-Estrutura canônica do `TASKS.md` gerado pela skill `criar-plan`. TASKS é o
+Estrutura canônica do `TASKS.md` gerado pela skill `preparar-execucao`. TASKS é o
 checklist de execução — cada task é uma unidade de trabalho que entrega
 valor em algum nível consumível (usuário, API ou componente). Pareado com
-`PLAN.md` no mesmo diretório `./.aidev/{slug}/`.
+`SPEC.md` e `PLAN.md` no mesmo diretório `./.aidev/{slug}/`, que forma um bundle
+**Open Knowledge Format (OKF)**.
 
 ## Semântica dos campos de controle
 
-**`prd`** — slug do PRD, igual ao usado no `PLAN.md` pareado. Cola entre
-tasks e fonte de verdade.
+O bundle segue OKF: o único campo **obrigatório** é `type`; os demais são
+convenção desta skill.
+
+**`type`** (OKF, obrigatório) — `tasks`. Roteia/filtra o concept.
+
+**`prd`** — slug do PRD (ou `none`), igual ao usado no `SPEC.md`/`PLAN.md`
+pareados. Cola entre tasks e fonte de verdade.
 
 **`plan_status`** — espelha o `status` do `PLAN.md` pareado para facilitar
 consulta sem abrir os dois arquivos.
@@ -19,12 +25,20 @@ consulta sem abrir os dois arquivos.
 
 ```markdown
 ---
-prd: <slug-do-prd>
-plan_status: rascunho | pronto | em-execucao | concluido
+type: tasks
+title: [Título da feature, espelhando o SPEC]
+description: [uma frase resumindo o checklist de execução]
+resource: [slug-do-prd | none]
+tags: [sdd, tasks]
 created: YYYY-MM-DD
+plan_status: rascunho | pronto | em-execucao | concluido
+prd: [slug-do-prd | none]
 ---
 
-# TASKS: [Título da feature, espelhando o PRD]
+# TASKS: [Título da feature, espelhando o SPEC]
+
+<!-- Referência (cross-link OKF): PLAN.md (irmão no bundle) → SPEC.md → PRD -->
+Ver [`PLAN.md`](PLAN.md) para a abordagem técnica e [`SPEC.md`](SPEC.md) para o contrato.
 
 ## [ ] T01 [P]: [título objetivo da task]
 - **USs cobertas:** US01, US02
@@ -103,10 +117,10 @@ disfarçada.
 
 Tasks marcadas com `[P]` no título podem ser executadas em paralelo com
 outras tasks `[P]` sem `needs:` conflitantes. O marcador é inferido
-automaticamente pelo `criar-plan`:
+automaticamente pelo `preparar-execucao`:
 
 - Task sem `needs:` → candidata a `[P]`
-- `criar-plan` cruza os `Arquivos Afetados` do PLAN para detectar sobreposição entre candidatas
+- `preparar-execucao` cruza os `Arquivos Afetados` do PLAN para detectar sobreposição entre candidatas
 - Sobreposição detectada → `needs:` automático aponta para a task conflitante; `[P]` não é aplicado
 - Sem sobreposição → `[P]` aplicado no título
 

@@ -4,6 +4,30 @@ Documento de registro do brainstorm realizado para definir um fluxo próprio de 
 
 ---
 
+## 0. Atualização (2026-07) — desacoplamento do SPEC e adoção do OKF
+
+Um segundo brainstorm revisou decisões deste registro. Mudanças em vigor no fluxo atual:
+
+- **Decisão 5.1 ("SPEC = PRD") revertida.** O contrato comportamental deixou de morar só no PRD. Nasce o `SPEC.md` — documento **orientado à IA** (US Rules, Edge cases, critérios de aceite §5a) — gerado junto de `PLAN.md` e `TASKS.md` no bundle `./.aidev/{slug}/`. Motivo: o PRD é leitura humana e carregava contexto demais para a IA desenvolver/validar; o SPEC é a projeção enxuta e testável. Em projeto grande, o SPEC projeta o PRD (que continua a fonte de verdade e vence em conflito; a IA abre o PRD sob demanda). Em projeto pequeno, **não há PRD** e o SPEC é autorado direto, virando a própria fonte de verdade.
+- **PRD agora é opcional** — referenciado quando existe, como TRD e ADR. Isso faz o SDD servir projeto grande **e** pequeno.
+- **`criar-plan` renomeada para `preparar-execucao`** — passou a emitir os três arquivos (SPEC+PLAN+TASKS) e ganhou dois modos de entrada (projeta do PRD / autora sem PRD).
+- **`validar-implementacao` criada** (a fase VALIDATE, antes só planejada): valida coerência código↔documentos, **avalia a divergência antes de agir** (pequena ajusta, grande pergunta ao usuário), delega rework estrutural à `preparar-execucao`, e fecha o ciclo promovendo `status: concluido` no frontmatter (sem mover arquivos).
+- **Formato Open Knowledge Format (OKF)** — o trio SPEC/PLAN/TASKS adota OKF (markdown + YAML frontmatter; `type` é o único campo obrigatório, o resto é convenção; cross-links markdown entre os documentos).
+
+### Atualização (2026-07) — decomposição em fatias, manifesto e orquestração paralela
+
+Um terceiro ciclo de brainstorm, disparado pela mudança no `escrever-prd` (milestone virou **marco de produto**, sem número mínimo, e o PRD passou a delegar o dimensionamento do artefato técnico ao PLAN/TASKS), evoluiu o fluxo:
+
+- **`preparar-execucao` passou a decompor** o escopo em **1..N fatias** — cada fatia é uma *feature independente e testável* com seu próprio bundle `./.aidev/{base}-{fatia}/`. O gatilho do corte é o tamanho do escopo (não a presença de PRD); N=1 vira bundle único sem sufixo, idêntico ao anterior. Marco/US viram rastreabilidade (rollup), não a régua do corte; a régua é independência + testabilidade.
+- **Novo artefato: o manifesto** `./.aidev/{base}-manifest.md` (gerado quando há 2+ fatias) — índice das fatias, grafo de dependência (`needs`/`[P]` de bundle, generalizando o `[P]` de task) e ondas de paralelismo já resolvidas.
+- **Nova skill `orquestrar-execucao`** — lê o manifesto, computa ondas e dispara `implementar-task` em paralelo, **uma instância por fatia isolada em git worktree** (branch `exec/{base}-{fatia}`), com merge por onda. Para na implementação; não valida.
+- **`implementar-task` ganhou o passo 2b** — avalia o catálogo de skills **em execução-time** e carrega as relevantes ao domínio do bundle (nada persistido, para não envelhecer); garante que cada instância paralela use as skills certas do seu bundle.
+- **Fluxo atualizado:** `escrever-prd` (opcional) → `preparar-execucao` (N fatias + manifesto) → `orquestrar-execucao` (paralelo, quando 2+ fatias) → `implementar-task` (×N) → `validar-implementacao`.
+
+O registro histórico abaixo é preservado como estava; onde ele diz "SPEC = PRD" ou "PLAN+TASKS", leia sob a luz desta atualização.
+
+---
+
 ## 1. Contexto
 
 ### 1.1 Objetivo do brainstorm
@@ -79,7 +103,7 @@ A pergunta inicial do usuário era "quais skills/agents/commands eu crio?". A pe
        ↓
   SPEC (= PRD)          →  escrever-prd (existe)
        ↓
-  PLAN + TASKS          →  criar-plan (a criar) — plano narrativo + checklist [ ]/[X]
+  PLAN + TASKS          →  preparar-execucao (a criar) — plano narrativo + checklist [ ]/[X]
        ↓
   IMPLEMENT             →  implementar-task (a criar) — executa tasks e marca [X]
        ↓
@@ -110,7 +134,7 @@ A pergunta inicial do usuário era "quais skills/agents/commands eu crio?". A pe
 SPEC e PRD são a mesma coisa neste fluxo. A skill `escrever-prd` já cobre essa fase. Não será criada uma skill separada de "spec".
 
 ### 5.2 PLAN + TASKS unificados
-Ficam em uma única skill (`criar-plan`). Motivo: quando o PLAN é editado ou revisitado, as tasks precisam mudar junto — separar as duas geraria dessincronia. Coesão é maior que granularidade nesse caso.
+Ficam em uma única skill (`preparar-execucao`). Motivo: quando o PLAN é editado ou revisitado, as tasks precisam mudar junto — separar as duas geraria dessincronia. Coesão é maior que granularidade nesse caso.
 
 ### 5.3 TASKS como checklist dentro do PLAN
 Formato: `[ ]` para pendente, `[X]` para concluído. Tasks e subtasks ficam no próprio documento do PLAN, em Markdown puro. Sem estruturas separadas ou bancos de dados — tudo versionado no repositório do projeto.
@@ -138,7 +162,7 @@ PLAN e TASKS referenciam o PRD via frontmatter (por exemplo, `prd: <slug>`). Iss
 - **TASKS:** via checkbox no próprio documento (`[ ]` / `[X]`), sem status separado.
 
 ### 5.10 Verificação de TRD antes do PLAN
-A skill `criar-plan` deve sempre verificar se existe TRD antes de gerar plano e tasks. Se existir, carrega como contexto; se não existir, segue sem — mas a checagem é obrigatória.
+A skill `preparar-execucao` deve sempre verificar se existe TRD antes de gerar plano e tasks. Se existir, carrega como contexto; se não existir, segue sem — mas a checagem é obrigatória.
 
 ---
 
@@ -150,7 +174,7 @@ Executadas em ordem, formam o eixo principal do fluxo.
 | Skill | Estado | Responsabilidade |
 |-------|--------|------------------|
 | `escrever-prd` | Existe | Cria/edita PRDs (fase SPEC) |
-| `criar-plan` | A criar | Lê PRD + TRD (se existir) e gera PLAN narrativo com TASKS em checkbox |
+| `preparar-execucao` | A criar | Lê PRD + TRD (se existir) e gera PLAN narrativo com TASKS em checkbox |
 | `implementar-task` | A criar | Executa task(s) do PLAN, respeita TRD, marca `[X]` ao concluir |
 | `validar-implementacao` | A criar | Verifica coerência código ↔ PRD + qualidade |
 
@@ -203,7 +227,7 @@ Categoria reservada. Ainda não definida. Escopo provisório: sub-fluxos ou rami
 Se o fluxo virar "OpenSpec pior", seria mais honesto adotar OpenSpec diretamente. O valor do fluxo próprio precisa estar na integração com o marketplace já existente (PRD, skills atuais) — não em reinventar o que OpenSpec já faz bem.
 
 ### 8.2 Sobreposição entre skills
-Hoje `escrever-prd` e `revisao-documento-tecnico` já tangenciam em função. Adicionar `criar-plan`, `criar-trd`, `criar-adr`, `implementar-task`, `validar-implementacao` aumenta o risco de responsabilidades sobrepostas. Cada skill nova precisa ter escopo claro para não virar 8 skills onde 3 resolviam.
+Hoje `escrever-prd` e `revisao-documento-tecnico` já tangenciam em função. Adicionar `preparar-execucao`, `criar-trd`, `criar-adr`, `implementar-task`, `validar-implementacao` aumenta o risco de responsabilidades sobrepostas. Cada skill nova precisa ter escopo claro para não virar 8 skills onde 3 resolviam.
 
 ### 8.3 Specs que envelhecem e viram ficção
 O maior risco de qualquer fluxo spec-driven: o spec envelhece, o código evolui, e ninguém atualiza. Sem mecanismo de reconciliação, o PRD e o PLAN deixam de refletir a realidade.
@@ -271,7 +295,7 @@ Trade-off 7.4 deixou em aberto. A decidir quando o fluxo for exercitado em uso r
 Nenhuma skill, agent ou command será criado a partir deste brainstorm sem decisão explícita do autor.
 
 ### 11.3 Sugestão de ordem quando a implementação começar
-- **Começar por `criar-plan`** — é a próxima peça após o PRD que já existe; fecha o primeiro gap crítico do fluxo.
+- **Começar por `preparar-execucao`** — é a próxima peça após o PRD que já existe; fecha o primeiro gap crítico do fluxo.
 - **Alternativa: `criar-trd`** — se o autor quiser estabelecer a referência global antes de gerar planos que a consomem automaticamente.
 
 As demais skills (`implementar-task`, `validar-implementacao`, `criar-adr`) vêm depois, conforme o fluxo for exercitado em casos reais.

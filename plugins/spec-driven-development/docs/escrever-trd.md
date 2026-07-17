@@ -6,7 +6,7 @@ Cria e mantém o TRD (Technical Requirements Document) do projeto em `docs/trd.m
 
 O TRD é o documento técnico global do projeto: um arquivo único, versionado no repositório,
 que captura stack, arquitetura, requisitos não-funcionais, dependências externas, padrões e
-decisões globais. Ele é a fonte de contexto técnico que `criar-plan` e `implementar-task`
+decisões globais. Ele é a fonte de contexto técnico que `preparar-execucao` e `implementar-task`
 carregam automaticamente — sem ele, essas skills operam às cegas e podem gerar planos ou
 implementações que divergem da realidade.
 
@@ -17,7 +17,7 @@ skill no **Modo Decision**.
 ## Quando usar
 
 - Ao iniciar um projeto novo que ainda não tem TRD
-- Antes de gerar o primeiro plano via `criar-plan` (especialmente se ela pediu contexto técnico global)
+- Antes de gerar o primeiro plano via `preparar-execucao` (especialmente se ela pediu contexto técnico global)
 - Quando a stack mudou e o TRD existente está desatualizado
 - Quando novas dependências externas foram adicionadas ao projeto
 - Quando o usuário mencionar "documentar a stack", "contexto técnico do projeto", "TRD" ou "arquitetura do projeto"
@@ -74,19 +74,19 @@ O TRD segue a estrutura canônica de `references/template-trd.md` com 6 seções
 ## Posição no fluxo spec-driven
 
 ```
-escrever-prd → escrever-trd → criar-plan → implementar-task → validar-implementacao
+escrever-prd → escrever-trd → preparar-execucao → implementar-task → validar-implementacao
                     ▲
            gera docs/trd.md
                     │
           carregado automaticamente por
-          criar-plan e implementar-task
+          preparar-execucao e implementar-task
 ```
 
 ## Relação com outras skills
 
 | Skill | Relação |
 |---|---|
-| `criar-plan` | Consome `docs/trd.md` como contexto técnico global; sem ele, entra em mini-modo de coleta |
+| `preparar-execucao` | Consome `docs/trd.md` como contexto técnico global; sem ele, entra em mini-modo de coleta |
 | `implementar-task` | Consome `docs/trd.md` quando referenciado pelo PLAN.md |
 | `escrever-prd` | Independente — PRDs documentam features, TRD documenta o projeto |
 | ADRs (`docs/adrs/`) | Criados pela própria skill no **Modo Decision** (`docs/adrs/NNN-slug.md`), que também atualiza a seção Decisões Globais |

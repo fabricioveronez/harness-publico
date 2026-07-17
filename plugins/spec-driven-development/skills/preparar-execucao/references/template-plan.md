@@ -1,14 +1,20 @@
 # Template PLAN.md
 
-Estrutura canônica do `PLAN.md` gerado pela skill `criar-plan`. O PLAN captura
-a abordagem técnica que guia a implementação de um PRD — é o "como" para o
-"o quê" do PRD. Pareado com `TASKS.md` no mesmo diretório `./.aidev/{slug}/`.
+Estrutura canônica do `PLAN.md` gerado pela skill `preparar-execucao`. O PLAN
+captura a abordagem técnica que guia a implementação — é o "como" para o "o quê"
+do `SPEC.md`. Pareado com `SPEC.md` e `TASKS.md` no mesmo diretório
+`./.aidev/{slug}/`, que forma um bundle **Open Knowledge Format (OKF)**.
 
 ## Semântica dos campos de controle
 
-**`prd`** — slug do PRD que este plano atende. Igual ao nome do arquivo do
-PRD sem extensão (ex.: `003-autenticacao-oauth`). É a cola entre PLAN e a
-fonte de verdade; nunca omitir.
+O bundle segue OKF: o único campo **obrigatório** é `type`; os demais são
+convenção desta skill.
+
+**`type`** (OKF, obrigatório) — `plan`. Roteia/filtra o concept.
+
+**`prd`** — slug do PRD que este plano atende, ou `none` (projeto sem PRD). Igual
+ao nome do arquivo do PRD sem extensão (ex.: `003-autenticacao-oauth`) e ao usado
+no `SPEC.md`/`TASKS.md` pareados. Cola de rastreabilidade; nunca omitir.
 
 **`status`** — ciclo de vida do plano, espelhando o PRD mas com semântica
 própria:
@@ -25,19 +31,26 @@ subsequentes.
 
 ```markdown
 ---
-prd: <slug-do-prd>
-status: rascunho | pronto | em-execucao | concluido
+type: plan
+title: [Título da feature, espelhando o SPEC]
+description: [uma frase resumindo a abordagem técnica]
+resource: [slug-do-prd | none]
+tags: [sdd, plan]
 created: YYYY-MM-DD
+status: rascunho | pronto | em-execucao | concluido
+prd: [slug-do-prd | none]
 ---
 
-# PLAN: [Título da feature, espelhando o PRD]
+# PLAN: [Título da feature, espelhando o SPEC]
 
-## Referência ao PRD
+## Referências
 
-- **Arquivo:** [`../../docs/prds/NNN-slug.md`](caminho)
-- **Resumo:** [2-3 linhas sintetizando a feature — o leitor que cair aqui
-  deve entender do que se trata sem abrir o PRD, mas o PRD é a fonte
-  autoritativa.]
+- **SPEC:** [`SPEC.md`](SPEC.md) — o contrato que este plano realiza (irmão no bundle)
+- **PRD:** [`../../docs/prds/NNN-slug.md`](caminho) — fonte de verdade (quando existe)
+- **Manifesto:** [`../{base}-manifest.md`](caminho) — índice das fatias e ondas de paralelismo (quando a decomposição tem 2+ fatias)
+- **Resumo:** [2-3 linhas sintetizando a feature — o leitor que cair aqui deve
+  entender do que se trata sem abrir o SPEC/PRD, mas o SPEC é o contrato e o PRD
+  (quando existe) é a fonte autoritativa.]
 
 ## Abordagem Técnica
 
@@ -110,13 +123,15 @@ deve revisar — se uma premissa estiver errada, voltar à skill e ajustar.
   - Convenções específicas: [resposta]
   - Restrições de ambiente: [resposta]
 
-## Milestones Cobertos
+## Marco Coberto
 
-Lista dos IDs de milestone do PRD endereçados por este plano. Se o plano
-cobre parcialmente (ex.: só M1), deixar explícito.
+O marco (milestone) do PRD que **esta fatia** atende. Uma fatia fica contida em
+um marco (fatia ⊆ marco); um marco pode ter várias fatias. Sem PRD, escrever
+`—` (não há milestones; o rollup cai para as USs/critérios de aceite do SPEC).
 
-- **Milestone 1**: [título do PRD] — coberto integralmente
-- **Milestone 2**: [título do PRD] — coberto parcialmente (tasks T08-T10)
+- **Marco**: [ID + título do marco no PRD], coberto pela fatia via US[s] [IDs].
+- **Outras fatias do mesmo marco** (quando houver): `{base}-{outra-fatia}` — ver
+  o manifesto `./.aidev/{base}-manifest.md` para o rollup completo.
 
 ## Riscos Técnicos
 
@@ -148,5 +163,5 @@ registro — impactam execução.
   consumido pela skill `implementar-task` para rodar linha de base, gate
   de validação e execução seletiva durante o loop de correção. Se o
   projeto não tem suíte de testes, registrar literalmente
-  `Sem suíte de testes detectada` (não omitir o campo). A skill `criar-plan`
+  `Sem suíte de testes detectada` (não omitir o campo). A skill `preparar-execucao`
   extrai esse comando do TRD quando existe ou pergunta no mini-modo.

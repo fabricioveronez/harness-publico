@@ -1,0 +1,73 @@
+{
+  "skill_name": "escrever-prd",
+  "notes": "Foco: validar a nova regra de granularidade. O caso-chave é o portal encadeado (eval 1) — domínios dependentes entre si que os três sinais antigos ('sem dependência', 'qualquer ordem', 'sem encadeamento') reprovavam como um PRD único, e que a trava nova ('cada parte se explica sozinha e entrega algo ao usuário?') deve splitar. Eval 2 é o guarda contra super-divisão. Eval 3 valida a semântica de milestone como marco de produto (justificativa + checklist, sem piso).",
+  "evals": [
+    {
+      "id": 1,
+      "name": "portal-encadeado-splita",
+      "prompt": "Quero especificar os requisitos do meu portal de conteúdo próprio, single-tenant (só a minha marca). Preciso cobrir: cadastro gratuito e login dos alunos, com papéis no backoffice (admin e autor); um modelo de conteúdo em árvore (formação → módulo → capítulo → aula, e também aula solta e artigo), com editor de texto, anexos, fluxo rascunho→publicado e posse do conteúdo por autor; controle de acesso — cada nó é público, cadastro-grátis ou restrito, e para ver conteúdo restrito o aluno precisa de um direito (compra vitalícia, assinatura ativa ou concessão externa); a página de consumo da aula, com player, registro de progresso e navegação livre pela trilha; e distribuição do texto como blog e como newsletter. Monta o PRD disso.",
+      "expected_output": "A skill NÃO gera um PRD monolítico. Reconhece que o input cobre múltiplas features (identidade, modelo de conteúdo/editorial, acesso/entitlement, consumo, distribuição) e propõe split em PRDs separados — apesar de os domínios serem dependentes/encadeados entre si. A justificativa do split apoia-se em auto-suficiência ('cada parte se explica e entrega algo ao usuário'), não em ausência de dependência, e trata a dependência como algo que vive no depends_on.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Propõe dividir o input em múltiplos PRDs (não gera um único PRD cobrindo tudo)",
+          "type": "qualitative"
+        },
+        {
+          "text": "NÃO justifica o split por 'ausência de dependência', 'independência entre os domínios', 'entregáveis em qualquer ordem' ou 'sem encadeamento' (os sinais antigos)",
+          "type": "qualitative"
+        },
+        {
+          "text": "Reconhece explicitamente que os PRDs propostos são dependentes/encadeados entre si e que isso é normal (menciona depends_on, encadeamento, ou que dependência não impede o corte)",
+          "type": "qualitative"
+        },
+        {
+          "text": "Justifica o split por auto-suficiência: cada parte proposta se explica sozinha e entrega algo observável ao usuário",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "feature-coesa-nao-superdivide",
+      "prompt": "Preciso documentar os requisitos da feature de autenticação por magic link do meu app. O usuário informa o email, recebe um link, clica e entra sem senha. Precisa cobrir: primeiro acesso cria a conta automaticamente, acessos seguintes apenas autenticam, o link expira em 15 minutos e é de uso único, e tem rate limit por email para não virar vetor de spam. Gera o PRD.",
+      "expected_output": "A skill gera UM único PRD para a feature de login por magic link. As partes descritas (criar conta no 1º acesso, autenticar, expiração, uso único, rate limit) viram Rules/US/milestones DENTRO do PRD — não PRDs separados. Elas não passam no teste de auto-suficiência como features próprias (nenhuma entrega valor observável sozinha, separada do login).",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Gera um único PRD (não propõe split em múltiplos PRDs)",
+          "type": "qualitative"
+        },
+        {
+          "text": "As partes (criar conta, autenticar, expiração/uso único, rate limit) aparecem como US/Rules/milestones dentro do PRD, não como features separadas",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "milestone-como-marco-sem-piso",
+      "prompt": "Quero um PRD para uma feature pequena: exportar o histórico de pedidos do cliente em CSV. O cliente clica em 'exportar', o sistema gera um CSV com os pedidos dos últimos 12 meses e faz o download no navegador. Se o cliente não tiver pedidos no período, mostra um aviso em vez de baixar um arquivo vazio. Gera o PRD com os milestones.",
+      "expected_output": "PRD de uma feature pequena. Os milestones são marcos de produto (o que o cliente ganha), cada um com uma justificativa de por que é um marco e um checklist de aceite marcável. A skill NÃO força um mínimo de 3 milestones para uma feature pequena — 1 ou 2 marcos legítimos são aceitáveis. Os milestones não contêm tarefas técnicas nem ordem de execução.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Cada milestone tem uma justificativa de 'por que é um marco' (o que o usuário ganha)",
+          "type": "qualitative"
+        },
+        {
+          "text": "Cada milestone tem um checklist de aceite com itens marcáveis (checkboxes), derivado dos critérios de aceite",
+          "type": "qualitative"
+        },
+        {
+          "text": "NÃO força um mínimo de 3 milestones nem inventa marcos para bater cota — a quantidade acompanha o tamanho real da feature",
+          "type": "qualitative"
+        },
+        {
+          "text": "Os milestones não contêm tarefas técnicas, passos de implementação nem ordem de execução (isso é do preparar-execucao)",
+          "type": "qualitative"
+        }
+      ]
+    }
+  ]
+}

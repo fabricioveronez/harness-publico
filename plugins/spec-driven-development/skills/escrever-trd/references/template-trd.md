@@ -1,7 +1,7 @@
 # TRD — Technical Requirements Document
 
 > Documento técnico global do projeto. Criado e atualizado via skill `escrever-trd`.
-> Carregado automaticamente por `criar-plan` e `implementar-task` como contexto global.
+> Carregado automaticamente por `preparar-execucao` e `implementar-task` como contexto global.
 > Granularidade baixa: cobre o que é global e estável. Regras finas ficam em ADRs.
 
 ---

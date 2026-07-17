@@ -1,24 +1,28 @@
 ---
 name: implementar-task
 description: >
-  Executa as tasks de um PLAN+TASKS em cadeia automática a partir de
-  `./.aidev/{slug}/`, marcando `[X]` em passos, validações e títulos
-  conforme avança. Lê o PRD em `./docs/prds/`, valida o `status`
-  (`concluído` aborta, `rascunho` confirma, `pronto` transiciona para
-  `em-progresso`, `em-progresso` prossegue), respeita `needs:` entre
-  tasks, executa grupos de tasks `[P]` em paralelo quando possível,
-  e roda o bloco Validação de cada task. Em falha, entra
-  em loop de correção de até 5 ciclos com execução seletiva de testes;
-  ao esgotar ciclos ou detectar lacuna no PRD, pausa, registra um
-  bloco `> Pausa em ...` no `TASKS.md` e devolve controle. Trata o PRD,
-  o PLAN e o TASKS (e o TRD quando referenciado) como fonte única de
-  verdade — nunca inventa informação; quando falta dado, consulta a
-  documentação ou pausa como lacuna. Retomada é automática quando
-  PLAN/TASKS já existem, preservando todo progresso `[X]`. Ao concluir
-  uma task com validação verde, cria **commit automático** em semantic
-  commit de uma linha (sem assinatura IA), incluindo só os arquivos
-  tocados pela task mais o `TASKS.md`. Nunca edita o PRD nem a
-  estrutura do PLAN/TASKS.
+  Executa as tasks de um bundle SPEC+PLAN+TASKS em cadeia automática a
+  partir de `./.aidev/{slug}/`, marcando `[X]` em passos, validações e
+  títulos conforme avança. Carrega o `SPEC.md` como **contexto primário**
+  (o contrato de comportamento: US Rules, Edge cases, critérios de aceite)
+  e abre o PRD em `./docs/prds/` **sob demanda** apenas quando o SPEC o
+  referencia e é preciso o *porquê* de uma regra; valida o `status` do PRD
+  quando ele existe (`concluído` aborta, `rascunho` confirma, `pronto`
+  transiciona para `em-progresso`, `em-progresso` prossegue). Respeita
+  `needs:` entre tasks, executa grupos `[P]` em paralelo quando possível,
+  e roda o bloco Validação de cada task. Em falha, entra em loop de
+  correção de até 5 ciclos com execução seletiva de testes; ao esgotar
+  ciclos ou detectar lacuna no SPEC, pausa, registra um bloco
+  `> Pausa em ...` no `TASKS.md` e devolve controle. Trata o SPEC (com
+  PRD/TRD sob demanda), o PLAN e o TASKS como fonte de verdade — nunca
+  inventa informação; quando falta dado, consulta a documentação ou pausa
+  como lacuna. Retomada é automática quando o bundle já existe, preservando
+  todo progresso `[X]`. Ao concluir uma task com validação verde, cria
+  **commit automático** em semantic commit de uma linha (sem assinatura IA),
+  incluindo só os arquivos tocados pela task mais o `TASKS.md`. Nunca edita
+  o SPEC/PRD nem a estrutura do PLAN/TASKS. No início de cada invocação
+  avalia o catálogo de skills atual e carrega as relevantes ao domínio do
+  bundle (execução-time, nada persistido).
   Use quando o usuário quiser implementar tarefa, executar tasks,
   rodar o plano, tocar a implementação de uma feature, retomar de
   onde parou, continuar implementando, executar a próxima task,
@@ -29,25 +33,30 @@ description: >
 
 # Implementar Task
 
-Executa o `TASKS.md` de um PRD em cadeia automática, partindo de
-`./.aidev/{slug}/PLAN.md` + `./.aidev/{slug}/TASKS.md`. Para cada task
-elegível: roda os passos, executa o bloco Validação, e marca `[X]` se
-tudo passar. Em falha, tenta corrigir em até 5 ciclos com execução
-seletiva de testes; se esgotar ou bater em lacuna no PRD, pausa,
-registra nota no `TASKS.md` e devolve controle.
+Executa o `TASKS.md` de uma feature em cadeia automática, partindo do bundle
+`./.aidev/{slug}/` (`SPEC.md` + `PLAN.md` + `TASKS.md`). O `SPEC.md` é o
+**contexto primário** — o contrato de comportamento contra o qual a
+implementação corre; o PRD só é aberto sob demanda quando o SPEC o referencia.
+Para cada task elegível: roda os passos, executa o bloco Validação, e marca
+`[X]` se tudo passar. Em falha, tenta corrigir em até 5 ciclos com execução
+seletiva de testes; se esgotar ou bater em lacuna no SPEC, pausa, registra
+nota no `TASKS.md` e devolve controle.
 
-A skill **cria commit automático** ao fim de cada task aprovada
-(semantic commit, uma linha, sem assinatura IA), mas **não edita o
-PRD** (papel de `escrever-prd`) e **não muda a estrutura do PLAN ou
-TASKS** (papel de `criar-plan`). Marca `[X]` em passos, validações e
+A skill **cria commit automático** ao fim de cada task aprovada (semantic
+commit, uma linha, sem assinatura IA), mas **não edita o SPEC/PRD** (papel de
+`escrever-prd`/`preparar-execucao`) e **não muda a estrutura do PLAN ou
+TASKS** (papel de `preparar-execucao`). Marca `[X]` em passos, validações e
 títulos e adiciona blocos de pausa quando necessário.
 
 ## Papel no fluxo spec-driven
 
-O fluxo é: `escrever-prd` → `criar-plan` → **`implementar-task`** →
-`validar-implementacao`. Esta é a terceira peça — assume que existe um
-PRD com `status: pronto` (ou `em-progresso`) e que `criar-plan` já
-gerou `PLAN.md` + `TASKS.md` em `./.aidev/{slug}/`.
+O fluxo é: `escrever-prd` (opcional) → `preparar-execucao` →
+**`implementar-task`** → `validar-implementacao`. Esta é a terceira peça —
+assume que `preparar-execucao` já gerou o bundle `SPEC.md` + `PLAN.md` +
+`TASKS.md` em `./.aidev/{slug}/`. O PRD é **opcional**: quando existe
+(`prd:` no frontmatter do bundle aponta um slug), é a fonte de verdade e é
+lido sob demanda; quando `prd: none` (projeto pequeno), o `SPEC.md` é a
+própria fonte de verdade.
 
 Princípios herdados:
 
@@ -67,50 +76,61 @@ Princípios herdados:
 
 ## Entrada
 
-`$ARGUMENTS` — se fornecido, tratar como referência ao slug do PRD
-(número, slug ou caminho). Se ausente:
+`$ARGUMENTS` — se fornecido, tratar como referência ao slug do bundle
+(número/slug do PRD, slug da feature, ou caminho em `./.aidev/`). Se ausente:
 
 - **Único diretório em `./.aidev/`** → autodetecta esse slug.
 - **Múltiplos diretórios** → listar e pedir ao usuário qual usar.
-- **Nenhum diretório** → abortar sugerindo invocar `criar-plan`.
+- **Nenhum diretório** → abortar sugerindo invocar `preparar-execucao`.
 
 A skill não declara modo "primeira execução" vs "retomada" — detecta
 automaticamente pela presença de notas de pausa e de marcações `[X]`
-no `TASKS.md`. Em qualquer invocação, sempre re-executa a linha de
-base verde (otimização A) antes de iniciar a próxima task elegível.
+no `TASKS.md`. Em qualquer invocação, sempre reavalia as skills relevantes
+ao bundle (passo 2b) e re-executa a linha de base verde (otimização A)
+antes de iniciar a próxima task elegível.
 
 ## Fluxo de Execução
 
-### 1. Localização do slug e validação do PRD
+### 1. Localização do slug e validação do bundle/PRD
 
 1. Resolver o slug a partir de `$ARGUMENTS` ou autodetecção em
    `./.aidev/`.
-2. Localizar o PRD em `./docs/prds/{slug}.md` (ou caminho convencional
-   do projeto). Se não existir, abortar com mensagem clara.
-3. Ler o `status` do frontmatter do PRD:
-   - `concluído` → **abortar**. PRDs concluídos são imutáveis.
-   - `rascunho` → **pedir confirmação explícita** ("PRD ainda está
-     em rascunho. Executar mesmo assim? Recomendo finalizar via
-     `escrever-prd` antes."). Sem confirmação, abortar.
-   - `pronto` → **promover para `em-progresso`** antes de iniciar a
-     primeira task. Editar apenas o frontmatter; não tocar no corpo.
-   - `em-progresso` → prosseguir direto.
+2. Ler o `SPEC.md` do bundle e o campo `prd:` do frontmatter.
+3. **PRD é opcional.** Só validar o PRD quando `prd:` aponta um slug (não
+   `none`):
+   - Localizar o PRD em `./docs/prds/{prd}.md` (ou caminho convencional). Se
+     o SPEC referencia um PRD que sumiu, **pausar** com `lacuna-spec` e pedir
+     que o usuário reconcilie (via `preparar-execucao`) ou ajuste o SPEC.
+   - Ler o `status` do PRD:
+     - `concluído` → **abortar**. PRDs concluídos são imutáveis.
+     - `rascunho` → **pedir confirmação explícita** ("PRD ainda em rascunho.
+       Executar mesmo assim? Recomendo finalizar via `escrever-prd` antes.").
+       Sem confirmação, abortar.
+     - `pronto` → **promover para `em-progresso`** antes da primeira task
+       (editar apenas o frontmatter; não tocar no corpo).
+     - `em-progresso` → prosseguir.
+   - Quando `prd: none` (projeto pequeno), **pular** a validação de PRD — o
+     `SPEC.md` é a fonte de verdade.
 
 ### 2. Carregamento de contexto e checagem de coerência estrutural
 
-1. Ler `./.aidev/{slug}/PLAN.md` e `./.aidev/{slug}/TASKS.md`
-   integralmente. Se algum estiver ausente, abortar sugerindo
-   `criar-plan`.
+1. Ler `./.aidev/{slug}/SPEC.md`, `./.aidev/{slug}/PLAN.md` e
+   `./.aidev/{slug}/TASKS.md` integralmente — o `SPEC.md` é o **contexto
+   primário** de comportamento. Se algum estiver ausente, abortar sugerindo
+   `preparar-execucao`. O PRD **não** é carregado aqui; só sob demanda (passo 8
+   e tratamento de lacuna).
 2. Validar coerência estrutural:
-   - Frontmatter de `TASKS.md` tem `prd: {slug}` igual ao PRD.
+   - Frontmatter de `SPEC.md`/`PLAN.md`/`TASKS.md` tem `prd:` consistente
+     entre si.
    - IDs de task seguem padrão `T01`, `T02`, sequencial.
    - Toda `needs:` referencia ID existente no próprio TASKS.
    - Toda task tem bloco `Passos:` e `Validação:` não-vazios.
+   - Toda `US` citada em "USs cobertas" existe no `SPEC.md`.
 3. **Incoerência estrutural** → registrar nota de pausa com motivo
    `incoerencia-estrutural` na primeira task afetada e abortar
-   sugerindo reconciliação via `criar-plan`.
+   sugerindo reconciliação via `preparar-execucao`.
 4. Localizar o campo `Comando de teste:` em "Contexto Técnico Global"
-   do `PLAN.md`. Esse campo é obrigatório (a `criar-plan` garante).
+   do `PLAN.md`. Esse campo é obrigatório (a `preparar-execucao` garante).
    Se vier `Sem suíte de testes detectada`, marcar internamente
    `sem_suite = true` e pular as otimizações A, B e C ao longo do fluxo.
    O commit por task continua saindo — a Validação intrínseca é o gate.
@@ -124,6 +144,41 @@ base verde (otimização A) antes de iniciar a próxima task elegível.
    - **Sujo apenas com arquivos dentro do escopo** (ex.: retomada após
      pausa que deixou edições parciais) → seguir; essas edições serão
      consolidadas pelo commit da task quando ela ficar verde.
+
+### 2b. Avaliação e carga de skills relevantes (pré-execução)
+
+Antes de rodar a primeira task, avaliar quais skills do catálogo atual se
+aplicam a este bundle e carregá-las. A avaliação é **em execução-time** —
+resolvida contra o catálogo vivo a cada invocação, **nunca** a partir de uma
+lista gravada (uma lista no PLAN/bundle envelheceria contra o catálogo de
+skills, que muda por conta própria).
+
+1. **Inferir os domínios/concerns** do trabalho deste bundle a partir do que
+   já foi carregado no passo 2: níveis das tasks (usuário/API/componente),
+   passos, "USs cobertas", e principalmente "Arquivos Afetados" e "Contexto
+   Técnico Global" do `PLAN.md` (stack, framework, ferramentas de teste).
+   Ex.: "Python + pytest + API REST", "TypeScript + React + Playwright".
+2. **Casar contra o catálogo de skills disponível na sessão** — comparar os
+   domínios inferidos com as descrições das skills disponíveis e selecionar as
+   que claramente cobrem o trabalho (boas práticas da linguagem, padrão de
+   testes, um framework/serviço citado).
+3. **Carregar** as skills selecionadas (invocá-las) antes de iniciar as tasks.
+   A carga é **sugestão, não trava**: se durante a execução surgir necessidade
+   de outra skill, invocá-la na hora.
+4. **Nada é persistido** — não gravar a lista escolhida no PLAN, TASKS, SPEC
+   nem em qualquer arquivo do bundle. A cada invocação (inclusive retomada) o
+   passo roda de novo e resolve fresco; é idempotente com a re-execução da
+   linha de base.
+
+Racional do execução-time: nada gravado → nada envelhece contra o catálogo. E
+como cada subagente do orquestrador paralelo (`orquestrar-execucao`) roda esta
+skill no seu bundle, cada um executa este passo e carrega as skills certas do
+**seu** escopo, sem depender de o auto-trigger acordar no contexto fresco do
+subagente. Trade-off aceito: menos determinismo entre runs, em troca de sempre
+usar a skill vigente.
+
+Se nenhuma skill do catálogo casar com os domínios, seguir sem carga
+adicional — não bloquear.
 
 ### 3. Linha de base verde (otimização A)
 
@@ -188,8 +243,8 @@ Para cada passo `[ ]` da task selecionada, na ordem definida:
    - Sem teste inferido → seguir sem rodar nada.
 
 **Pausa por lacuna durante os passos** — se a execução exige decisão
-de negócio que o PRD não cobre (ver critério operacional na seção
-"Tratamento de pausa por lacuna no PRD" abaixo), parar imediatamente
+de negócio que o SPEC não cobre (ver critério operacional na seção
+"Tratamento de pausa por lacuna no SPEC" abaixo), parar imediatamente
 nesse passo (sem marcá-lo `[X]`) e seguir para o passo 9 sem passar
 pela Validação.
 
@@ -248,21 +303,21 @@ Para cada ciclo:
   de marcar `[X]` na próxima invocação.
 - **Correção exigiria editar PLAN ou TASKS estruturalmente** (não
   só marcar `[X]`): ir para o passo 9 com motivo
-  `incoerencia-estrutural` — `criar-plan` precisa reconciliar.
+  `incoerencia-estrutural` — `preparar-execucao` precisa reconciliar.
 
-### 8. Gate final de critérios técnicos do PRD
+### 8. Gate final de critérios de aceite do SPEC
 
 Disparado quando não há mais tasks elegíveis (todas `[X]` ou todas
 bloqueadas).
 
-1. Ler a tabela "Critérios técnicos" da seção 5 do PRD.
+1. Ler a tabela "Critérios de Aceite" (§5a) do `SPEC.md`.
 2. Para cada critério, aplicar a heurística da seção 3 do
    `references/heuristicas-execucao.md` para classificar como
    **executável** ou **manual**.
 3. Executar os critérios executáveis e reportar `OK | FALHA |
    ERRO_DE_EXECUÇÃO`. Listar os manuais como `verificação manual
    sugerida`.
-4. **Gerar tabela de cobertura de USs**: cruzar todas as USs do PRD
+4. **Gerar tabela de cobertura de USs**: cruzar todas as USs do `SPEC.md`
    contra o campo `USs cobertas:` de cada task do TASKS.md.
 
    ```
@@ -300,8 +355,8 @@ Toda pausa segue o mesmo protocolo:
    Não reverter trabalho.
 2. **Não marcar `[X]` no título da task** — task fica `[ ]`.
 3. **Aplicar detecção de drift** (seção 4 do `heuristicas-execucao.md`)
-   para capturar `mtime` atuais do PRD e do TASKS no `Snapshot` da
-   nota.
+   para capturar `mtime` atuais do `SPEC.md`, do `TASKS.md` e do PRD
+   (quando `prd:` aponta um slug) no `Snapshot` da nota.
 4. **Registrar bloco de pausa** no `TASKS.md` ao final da task em
    pausa, conforme `references/template-nota-pausa.md`. Notas são
    **acumulativas** — nunca sobrescrever pausa anterior.
@@ -312,7 +367,7 @@ Toda pausa segue o mesmo protocolo:
 7. **Devolver controle** com:
    - Identificação do problema (motivo + descrição).
    - Sugestões de próxima ação adequadas ao motivo (ver seção
-     "Tratamento de pausa por lacuna no PRD" para o caso `lacuna-prd`).
+     "Tratamento de pausa por lacuna no SPEC" para o caso `lacuna-spec`).
    - Estado preservado para retomada.
 
 ### 10. Retomada (segunda invocação em diante)
@@ -320,8 +375,8 @@ Toda pausa segue o mesmo protocolo:
 Acionada automaticamente quando `PLAN.md`/`TASKS.md` já existem.
 
 1. Aplicar detecção de drift (seção 4 do `heuristicas-execucao.md`).
-   Se houver drift no PRD, **interromper antes de tudo** e sugerir
-   `criar-plan` em modo reconciliação.
+   Se houver drift no `SPEC.md` (ou no PRD, quando existe), **interromper
+   antes de tudo** e sugerir `preparar-execucao` em modo reconciliação.
 2. Carregar `docs/MEMORY.md` se existir — a seção `## Sessão atual`
    fornece contexto da pausa anterior sem necessidade de reler todo
    o TASKS.md.
@@ -330,7 +385,7 @@ Acionada automaticamente quando `PLAN.md`/`TASKS.md` já existem.
    `esgotamento-ciclos`. Detalhes: ..."). Notas antigas **nunca** são
    apagadas — ficam como histórico.
 4. Perguntar se o usuário quer retomar do ponto exato ou revisar
-   PRD/PLAN antes (sugerindo a skill apropriada).
+   SPEC/PLAN antes (sugerindo a skill apropriada).
 5. Confirmação de retomada → re-executar linha de base verde (passo 3),
    selecionar próxima task elegível (passo 4), seguir o fluxo normal.
 6. Caso especial: **todas as tasks já estão `[X]`** → pular direto ao
@@ -338,19 +393,22 @@ Acionada automaticamente quando `PLAN.md`/`TASKS.md` já existem.
 
 ## Regras transversais
 
-### Fonte de verdade: PRD, PLAN, TASKS (e TRD quando referenciado)
+### Fonte de verdade: SPEC (primário), PLAN, TASKS — PRD/TRD sob demanda
 
 **Regra zero da skill, acima de qualquer otimização.**
 
-PRD, PLAN e TASKS são a fonte única de verdade da feature. A skill
-**nunca** inventa informação que não esteja explícita nesses
-documentos (ou no TRD do projeto, quando o PLAN o referencia).
+O `SPEC.md` é o contrato de comportamento e o **contexto primário**; PLAN e
+TASKS completam o roteiro técnico. A skill **nunca** inventa informação que não
+esteja explícita nesses documentos. O **PRD** (quando existe) e o **TRD**
+(quando o PLAN o referencia) são carregados **sob demanda** — o PRD para o
+*porquê* de uma regra, o TRD para contexto técnico global.
 
 Quando precisa de informação que não está clara:
 
-1. **Releia primeiro** — PRD, PLAN, TASKS, TRD, e qualquer arquivo
-   citado em "Arquivos Afetados" do PLAN. A resposta normalmente
-   está num documento que ainda não foi lido na sessão atual.
+1. **Releia primeiro** — SPEC, PLAN, TASKS, e qualquer arquivo citado em
+   "Arquivos Afetados" do PLAN. Se o *porquê* de uma regra for necessário e
+   houver PRD, abrir o PRD referenciado. A resposta normalmente está num
+   documento que ainda não foi lido na sessão atual.
 2. **Use as heurísticas documentadas** em
    `references/heuristicas-execucao.md` quando o sinal é técnico
    (path de teste, filtro seletivo, classificação de critério). As
@@ -358,14 +416,16 @@ Quando precisa de informação que não está clara:
    nunca chutar quando o fallback se aplica.
 3. **Trate como lacuna** quando, mesmo após releitura e aplicação
    das heurísticas, a informação necessária para uma decisão de
-   negócio está faltando ou ambígua. Disparar a pausa de US03
-   (motivo `lacuna-prd`) e devolver controle ao usuário com as três
-   opções (editar PRD via `escrever-prd`, reconciliar via
-   `criar-plan`, ou decidir inline registrando a premissa).
+   negócio está faltando ou ambígua no SPEC. Disparar a pausa de US03
+   (motivo `lacuna-spec`) e devolver controle ao usuário com as opções:
+   quando **há PRD**, editar o PRD via `escrever-prd` e reconciliar via
+   `preparar-execucao`; quando **não há PRD**, ajustar o SPEC via
+   `preparar-execucao`; ou decidir inline registrando a premissa.
 
 Não preencher silenciosamente. Não assumir intenção do usuário.
 Não inferir regra de negócio a partir do código existente — código
-é implementação de uma decisão; a decisão mora no PRD.
+é implementação de uma decisão; a decisão mora no SPEC (e, quando existe,
+no PRD que o embasa).
 
 ### Marcação `[X]` (granularidade e ordem)
 
@@ -427,7 +487,7 @@ permissão negada, caminho ausente, etc.) → tratar como pausa
 ### Bloco de nota de pausa
 
 Formato canônico em `references/template-nota-pausa.md`. Vocabulário
-controlado de motivos: `esgotamento-ciclos`, `lacuna-prd`,
+controlado de motivos: `esgotamento-ciclos`, `lacuna-spec`,
 `interrupcao-manual`, `regressao-fora-escopo`, `infra-erro-fatal`,
 `flaky-detectado`, `incoerencia-estrutural`, `falha-pre-existente`.
 Nunca usar texto livre como motivo.
@@ -445,8 +505,9 @@ mudança lógica), é sinal de loop estéril — pular direto para o passo
 
 Aplicar regra da seção 4 do `references/heuristicas-execucao.md`.
 Comparação por `mtime` capturado no `Snapshot` da última nota de
-pausa. Drift no PRD interrompe antes de qualquer execução; drift no
-TASKS exige confirmação do usuário; drift em ambos exige reconciliação.
+pausa. Drift no `SPEC.md` (ou no PRD, quando existe) interrompe antes de
+qualquer execução; drift no TASKS exige confirmação do usuário; drift em
+ambos exige reconciliação.
 
 ### Saída ao usuário (formato curto e fixo)
 
@@ -462,26 +523,29 @@ Notas relevantes: <últimas 2 notas de pausa, se houver, ou "nenhuma">
 
 Sem narração extensa, sem emoji.
 
-### Tratamento de pausa por lacuna no PRD (US03)
+### Tratamento de pausa por lacuna no SPEC (US03)
 
 Lacuna = (a) Rule citada na task referencia comportamento ausente do
-PRD, (b) Edge case da task contradiz o estado atual do código, ou
-(c) Validação requer decisão de negócio não documentada. **Não**
+`SPEC.md`, (b) Edge case da task contradiz o estado atual do código, ou
+(c) Validação requer decisão de negócio não documentada no SPEC. **Não**
 pausar por preferência estilística ou dúvida técnica menor — só
 quando continuar exigiria inventar regra de negócio.
 
 Ao detectar:
 
-1. Registrar pausa com motivo `lacuna-prd` (sem consumir ciclo).
-2. Apresentar ao usuário as três opções:
-   - Editar o PRD via `escrever-prd` para sanar a lacuna.
-   - Reconciliar PLAN+TASKS via `criar-plan` (quando a lacuna afeta
-     escopo ou estrutura, não só uma task).
-   - Decidir inline informando a premissa — a skill registra a
-     premissa na nota de pausa (linha extra `> Premissa registrada
-     inline: ...`) e retoma na próxima invocação.
+1. Registrar pausa com motivo `lacuna-spec` (sem consumir ciclo).
+2. Apresentar ao usuário as opções, conforme haja ou não PRD:
+   - **Com PRD** — editar o PRD via `escrever-prd` para sanar a lacuna e
+     reconciliar o bundle via `preparar-execucao`.
+   - **Sem PRD** — ajustar o `SPEC.md` via `preparar-execucao` (o SPEC é a
+     fonte de verdade).
+   - Reconciliar PLAN+TASKS via `preparar-execucao` quando a lacuna afeta
+     escopo ou estrutura, não só uma task.
+   - Decidir inline informando a premissa — a skill registra a premissa na
+     nota de pausa (linha extra `> Premissa registrada inline: ...`) e retoma
+     na próxima invocação.
 
-A skill **não edita** o PRD para suprir a lacuna em nenhuma hipótese.
+A skill **não edita** o SPEC nem o PRD para suprir a lacuna em nenhuma hipótese.
 
 ## Fora do escopo
 
@@ -491,18 +555,19 @@ Esta skill **não**:
   intermediários, commits de progresso parcial, commits de pausa ou
   squash retroativo. O usuário pode fazer commits manuais entre
   invocações (a skill detecta via working tree limpo e prossegue).
-- Edita o PRD (nem para suprir lacuna; papel de `escrever-prd`).
-- Edita estruturalmente o PLAN ou o TASKS (papel de `criar-plan`).
+- Edita o SPEC ou o PRD (nem para suprir lacuna; papel de
+  `preparar-execucao`/`escrever-prd`).
+- Edita estruturalmente o PLAN ou o TASKS (papel de `preparar-execucao`).
   Só marca `[X]` em passos/validações/títulos e adiciona blocos de
   pausa no `TASKS.md`.
-- Promove o status do PRD para `concluído` (papel de
+- Promove o status do PRD/SPEC para `concluído` (papel de
   `validar-implementacao`).
 - Executa em PRD com `status: concluído` (imutável) ou em `rascunho`
   sem confirmação explícita.
 - Impõe TDD ou ordem "teste antes do código" — usa testes como sinal
   quando existem, sem ditar estilo.
-- Faz validação global de coerência código↔PRD ou auditoria de
-  qualidade ampla (papel de `validar-implementacao`).
+- Faz validação global de coerência código↔SPEC/PRD ou auditoria de
+  qualidade ampla no fechamento (papel de `validar-implementacao`).
 - Gera ou atualiza TRD.
 
 ## Templates e heurísticas de referência
@@ -513,7 +578,7 @@ Consultar sempre que o fluxo invocar:
   de pausa, vocabulário controlado de motivos, variantes por motivo.
 - `references/heuristicas-execucao.md` — regras operacionais para
   inferir teste por passo (C), construir filtro seletivo (B),
-  interpretar critérios técnicos do PRD no gate final, e detectar
+  interpretar critérios de aceite do SPEC no gate final, e detectar
   drift entre invocações.
 - `references/template-memory.md` — estrutura canônica do
   `docs/MEMORY.md`. Usar ao criar o arquivo pela primeira vez.
