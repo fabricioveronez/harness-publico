@@ -24,7 +24,7 @@ A skill é um único `SKILL.md`, sem references ou scripts. Todo o conteúdo —
 
 - **typescript-practices** — skill irmã com o mesmo molde prescritivo, para o ecossistema TypeScript
 - **guia-de-testes** — cobre a escrita dos testes que os checklists de tarefa desta skill exigem
-- **criar-plan** — planejamento mais amplo de implementação; a seção "Planejamento de tarefas Python" aqui é a camada específica da linguagem
+- **preparar-execucao** — planejamento mais amplo de implementação; a seção "Planejamento de tarefas Python" aqui é a camada específica da linguagem
 - **implementar-task** — execução das tarefas decompostas segundo a estrutura definida nesta skill
 - **escrever-prd** / **escrever-trd** — definição de requisitos e decisões técnicas que antecedem a decomposição em tarefas
 
