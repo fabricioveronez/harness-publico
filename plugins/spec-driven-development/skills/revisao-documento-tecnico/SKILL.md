@@ -122,7 +122,8 @@ esqueleto é consequência do documento, não forma que o documento preenche:
 | Tipo | Upstream típico | Invariantes típicos | Dono típico da edição |
 |---|---|---|---|
 | PRD | intenção do usuário, TRD | Registro de Decisões | `escrever-prd` |
-| PLAN/TASKS | PRD | IDs de task, marcações `[X]` | `criar-plan` (reconciliação) |
+| SPEC.md (bundle `.aidev/`) | PRD (quando existe), senão intenção do usuário | IDs de US, critérios de aceite §5a | `preparar-execucao` |
+| PLAN/TASKS | SPEC (e PRD quando existe) | IDs de task, marcações `[X]` | `preparar-execucao` (reconciliação) |
 | TRD | código/stack real | — | `escrever-trd` |
 | spec/RFC avulsa | sistema que descreve | — | revisor edita direto |
 
@@ -257,8 +258,8 @@ evidenciada.
 Após o usuário aprovar o lote (ou vetar itens) e confirmar os itens da zona do usuário,
 aplique as correções **respeitando o dono de cada artefato** (identificado no Passo 3):
 
-- **Existe skill dona** (`escrever-prd`, `criar-plan`, `escrever-trd`): corrigir via
-  ela. Em cadeias derivadas (PRD → PLAN/TASKS), corrigir o upstream e propagar pela
+- **Existe skill dona** (`escrever-prd`, `preparar-execucao`, `escrever-trd`): corrigir via
+  ela. Em cadeias derivadas (PRD → SPEC → PLAN/TASKS), corrigir o upstream e propagar pela
   reconciliação da skill dona — ela já protege os invariantes (IDs, `[X]`). Não
   reimplementar essas regras aqui.
 - **Problema exclusivo do artefato derivado** (ex: `needs:` quebrado no TASKS.md, que

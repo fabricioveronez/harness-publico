@@ -86,12 +86,12 @@ Task T03 toca `src/api/users/create.ts`. Validação cita
 
 ---
 
-## 3. Interpretação de critérios técnicos do PRD (gate final)
+## 3. Interpretação de critérios de aceite do SPEC (gate final)
 
-Ao fim da cadeia de tasks, a skill executa os critérios técnicos do
-PRD que sejam **programaticamente verificáveis**. O PRD não marca
+Ao fim da cadeia de tasks, a skill executa os critérios de aceite (§5a) do
+`SPEC.md` que sejam **programaticamente verificáveis**. O SPEC não marca
 explicitamente quais critérios são automatizáveis — a skill interpreta
-por heurística textual.
+por heurística textual sobre a coluna "Como verificar (observável)".
 
 ### Sinais de critério executável
 
@@ -114,7 +114,7 @@ contém **pelo menos um** destes sinais:
 
 ### Comportamento
 
-Para cada critério da tabela "Técnicos":
+Para cada critério da tabela "Critérios de Aceite":
 
 1. Aplicar a regra acima e classificar como **executável** ou **manual**.
 2. Critérios executáveis: extrair o comando (do bloco em crase ou
@@ -125,9 +125,9 @@ Para cada critério da tabela "Técnicos":
 
 ### Importante
 
-O gate final **não promove o status do PRD para `concluído`** mesmo
-que tudo passe — essa transição é responsabilidade da skill futura
-`validar-implementacao`. O gate só reporta o estado.
+O gate final **não promove o status para `concluído`** mesmo que tudo
+passe — essa transição é responsabilidade da `validar-implementacao`, no
+fechamento. O gate só reporta o estado.
 
 ### Exemplo
 
@@ -150,31 +150,33 @@ Critério do PRD 002:
 
 ## 4. Detecção de drift entre invocações
 
-Quando a skill é reinvocada e encontra `PLAN.md`/`TASKS.md`
-existentes, precisa decidir se pode continuar com confiança ou se
-houve mudança desde a última pausa que invalida o estado salvo.
+Quando a skill é reinvocada e encontra o bundle
+(`SPEC.md`/`PLAN.md`/`TASKS.md`) existente, precisa decidir se pode
+continuar com confiança ou se houve mudança desde a última pausa que
+invalida o estado salvo.
 
 ### Regra
 
 A última nota de pausa de cada task carrega um `Snapshot` com `mtime`
-do PRD e do TASKS no momento da pausa (ver
-`template-nota-pausa.md`). Ao retomar:
+do `SPEC.md`, do `TASKS.md` e do PRD (quando `prd:` aponta um slug) no
+momento da pausa (ver `template-nota-pausa.md`). Ao retomar:
 
 1. Localizar a **última nota de pausa do arquivo** (qualquer task) e
    extrair o `Snapshot`.
-2. Comparar `mtime` atual do PRD e do TASKS contra o `Snapshot`.
+2. Comparar `mtime` atuais do SPEC, do TASKS e do PRD (quando existe)
+   contra o `Snapshot`.
 3. Classificar:
    - **Sem drift** — `mtime` atuais ≤ snapshot. Retomar normalmente.
    - **Drift no TASKS** apenas — alguém editou o TASKS manualmente
      desde a pausa. Antes de retomar, **mostrar diff resumido** e
      perguntar se as mudanças são propositais ou se o usuário quer
-     reconciliar via `criar-plan`.
-   - **Drift no PRD** — alguém editou o PRD desde a pausa. Sinalizar
-     que reconciliação via `criar-plan` é fortemente recomendada
-     antes de prosseguir, porque o PLAN pode estar desatualizado
-     em relação à fonte de verdade.
-   - **Drift em ambos** — pausa para reconciliação obrigatória; não
-     continuar sem alinhamento explícito do usuário.
+     reconciliar via `preparar-execucao`.
+   - **Drift no SPEC ou no PRD** — o contrato (ou sua fonte de verdade)
+     mudou desde a pausa. Sinalizar que reconciliação via
+     `preparar-execucao` é fortemente recomendada antes de prosseguir,
+     porque PLAN/TASKS podem estar desatualizados.
+   - **Drift em contrato + TASKS** — pausa para reconciliação obrigatória;
+     não continuar sem alinhamento explícito do usuário.
 
 ### Fallback
 
@@ -186,16 +188,16 @@ detecção de drift — não há baseline para comparar.
 
 Última nota da task T03 (registrada em 2026-04-17 14:30):
 ```
-> Snapshot: PRD mtime 2026-04-17 09:00, TASKS mtime 2026-04-17 14:25.
+> Snapshot: SPEC mtime 2026-04-17 09:05, TASKS mtime 2026-04-17 14:25, PRD mtime 2026-04-17 09:00.
 ```
 
 Ao retomar em 2026-04-19:
-- `mtime` atual do PRD: `2026-04-18 10:00` → drift no PRD.
+- `mtime` atual do SPEC: `2026-04-18 10:00` → drift no SPEC.
 - `mtime` atual do TASKS: `2026-04-17 14:25` → sem drift.
 
 Ação: alertar
-> "PRD foi alterado em 2026-04-18 10:00 (após a última pausa em
-> 2026-04-17 14:30). Recomendo invocar `criar-plan` em modo
+> "SPEC foi alterado em 2026-04-18 10:00 (após a última pausa em
+> 2026-04-17 14:30). Recomendo invocar `preparar-execucao` em modo
 > reconciliação antes de retomar a execução. Continuar mesmo assim
 > ou pausar para reconciliar?"
 
@@ -216,7 +218,7 @@ usuário.
 
 - **`<tipo>`** inferido pelo campo `**Nível:**` da task no `TASKS.md`
   (tabela abaixo).
-- **`<slug>`** é o slug do PRD (nome do diretório em `./.aidev/`,
+- **`<slug>`** é o slug do bundle (nome do diretório em `./.aidev/`,
   removendo o prefixo numérico — ex.: `002-implementar-task` →
   `implementar-task`).
 - **`<titulo-da-task>`** é o título da task sem o prefixo `TNN:`,
@@ -271,7 +273,7 @@ alheios. Se um arquivo modificado **não está** em "Arquivos
 Afetados", a skill já teria pausado no passo 2 com
 `working-tree-sujo`. Se mesmo assim chegar aqui (ex.: passo da task
 editou arquivo não previsto no PLAN), tratar como incoerência — a
-correção é reconciliação via `criar-plan`, não burlar o filtro.
+correção é reconciliação via `preparar-execucao`, não burlar o filtro.
 
 ### Comando completo
 

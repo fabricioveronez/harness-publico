@@ -23,6 +23,7 @@ Aplicando:
 | Decisão arquitetural durável (imutável) | ADR (`docs/adrs/`) |
 | NFR global (p95 geral, uptime, criptografia) | TRD |
 | Decomposição em tarefas | PLAN/TASKS |
+| Dimensionamento/rastreio do artefato técnico (bundle, fatia, verticalização) | PLAN/TASKS — o PRD referencia, mas não dirige |
 
 ## Semântica dos campos de controle
 
@@ -31,7 +32,7 @@ Aplicando:
 - `rascunho` — em criação ou revisão, ainda não aprovado
 - `pronto` — aprovado, aguardando planejamento/execução
 - `em-progresso` — execução ativa (transição feita pela skill de planejamento/execução)
-- `concluído` — feature entregue; **o PRD congela e vira registro histórico imutável**
+- `concluído` — feature entregue; **o PRD congela e vira registro histórico imutável**. Alcançado quando **todos os milestones têm o checklist de aceite aprovado**. A transição em si é feita por quem aprova/executa, **não por esta skill** (que não faz transição de estado)
 
 Quando um PRD chega em `concluído`, ele não é mais editado. Mudanças de comportamento posteriores abrem um novo PRD que pode referenciar o original via `depends_on`.
 
@@ -165,29 +166,35 @@ NFR global do projeto (p95 geral, uptime, criptografia) mora no TRD, não aqui.
 
 ### Milestone 1: [Verbo + Substantivo]
 
-**Objetivo:** [Uma frase descrevendo o valor de negócio entregue por este marco.]
+**Por que é um marco:** [o que o usuário ganha; por que se anuncia como conquista.]
 
 **Funcionalidades:** US01, US02
 
-**Critério de conclusão:**
-- Condição: [o que precisa ser verdade, em termos observáveis, para considerar concluído]
-- Aprovador: [quem dá o OK — papel ou pessoa]
+**Checklist de aceite** (marcado pelo Aprovador após a implementação):
+- [ ] [critério observável de §5a, filtrado pelas USs deste marco]
+- [ ] [critério observável de §5a, filtrado pelas USs deste marco]
+
+**Aprovador:** [quem dá o OK — papel ou pessoa]
 
 ### Milestone 2: [Verbo + Substantivo]
 
-**Objetivo:** [Uma frase.]
+**Por que é um marco:** [uma frase.]
 
 **Funcionalidades:** US03
 
-**Critério de conclusão:**
-- Condição: [o que precisa ser verdade]
-- Aprovador: [quem dá o OK]
+**Checklist de aceite** (marcado pelo Aprovador após a implementação):
+- [ ] [critério observável de §5a, filtrado pelas USs deste marco]
 
-[Repetir para 3-6 milestones no total. Cada milestone é uma fatia de valor
-independentemente entregável quando possível, definida por **quais USs cobre** e
-**qual condição de negócio fecha o marco**. A decomposição em tarefas técnicas
-(passos, validação, ordem de execução) é do PLAN/TASKS, gerado por `criar-plan` —
-não detalhar tarefas aqui.]
+**Aprovador:** [quem dá o OK — papel ou pessoa]
+
+[Um milestone é um **marco de produto**: um conjunto coeso de funcionalidades que entrega
+algo ao usuário — algo que se anuncia como conquista, não uma fatia de execução. Definido por
+**quais USs cobre**, por uma **justificativa de por que é um marco** (auto-avaliação: se sai
+forçada, é tarefa disfarçada ou dois marcos espremidos) e por um **checklist de aceite**
+(critérios de §5a filtrados pelas USs, marcáveis pelo Aprovador). **Sem número mínimo**; o teto
+de ~6 é sinal de que talvez sejam várias features (ver §2a). A decomposição em tarefas técnicas
+(passos, validação, ordem de execução) e o dimensionamento do artefato de execução são do
+PLAN/TASKS, gerados por `preparar-execucao` — não detalhar nem dirigir isso aqui.]
 
 ## 7. Riscos e Dependências
 
