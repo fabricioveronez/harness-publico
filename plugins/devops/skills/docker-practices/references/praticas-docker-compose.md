@@ -1,6 +1,6 @@
-# Compose para desenvolvimento
+# Práticas de Docker Compose
 
-> **Quando ler:** ao montar o ambiente local de uma app que depende de banco/Redis/fila. Quando o `docker compose up` "sobe" mas a app não responde. Para entender por que `depends_on` simples não basta.
+> **Quando ler:** ao montar o ambiente local de uma app que depende de banco/Redis/fila. Quando o `docker compose up` "sobe" mas a app não responde. Ao separar cenários de dev e produção no mesmo projeto. Para entender por que `depends_on` simples não basta.
 
 ## Índice
 
