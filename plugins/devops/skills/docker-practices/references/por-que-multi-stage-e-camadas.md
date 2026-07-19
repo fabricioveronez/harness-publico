@@ -7,8 +7,9 @@
 1. [O modelo mental: imagem como pilha de camadas](#o-modelo-mental-imagem-como-pilha-de-camadas)
 2. [Cache: por que a ordem das instruções importa](#cache-por-que-a-ordem-das-instruções-importa)
 3. [O problema que multi-stage resolve](#o-problema-que-multi-stage-resolve)
-4. [Anatomia comentada de um Dockerfile multi-stage](#anatomia-comentada-de-um-dockerfile-multi-stage)
-5. [Erros comuns de iniciante](#erros-comuns-de-iniciante)
+4. [Arquitetura de stages: decidindo o desenho](#arquitetura-de-stages-decidindo-o-desenho)
+5. [Anatomia comentada de um Dockerfile multi-stage](#anatomia-comentada-de-um-dockerfile-multi-stage)
+6. [Erros comuns de iniciante](#erros-comuns-de-iniciante)
 
 ---
 
@@ -142,6 +143,86 @@ Resultado típico: imagem final cai de 1.5 GB para 200 MB. Em alguns casos (Go, 
 | **Mais segura** | Menos software = menos CVEs. Sem `gcc` em produção, sem `npm` para um atacante usar |
 | **Pull mais rápido** | Pods Kubernetes sobem mais rápido. Cold start de Lambda menor |
 | **Separação de responsabilidades** | Cada estágio tem um propósito claro |
+
+## Arquitetura de stages: decidindo o desenho
+
+Saber *como* multi-stage funciona não responde às perguntas práticas: preciso disso no meu projeto? quantos stages? o que copio de um para o outro? São três decisões independentes.
+
+### Eixo 1 — vale a pena aqui?
+
+O ganho de multi-stage não depende da linguagem, e sim de **quanto o artefato final difere do que foi preciso para produzi-lo**. Onde essa distância é grande, o ganho é grande.
+
+| Natureza do artefato | Vale? | Ganho e por quê |
+|---|---|---|
+| Compilada (Go, Rust, C#, Java) | Obrigatório | Enorme. O binário não precisa de nada do toolchain — runtime pode ser distroless ou até `scratch`. 1 GB → 20 MB |
+| Transpilada (TS, bundlers, Sass) | Obrigatório | Grande. Sai o toolchain inteiro e as devDependencies; fica o `dist/` |
+| Interpretada com extensões C (`psycopg2`, `node-gyp`, `nokogiri`) | Sim | Médio. Sai o `build-essential`, fica o código. A economia é o compilador, não a aplicação |
+| Interpretada pura (Python puro, PHP) | Opcional | Pequeno. Só evita cache do pip/composer. Single-stage sobre base slim é honesto aqui |
+| Assets estáticos → nginx | Obrigatório | O caso clássico: Node constrói, nginx serve. Zero Node na imagem final |
+
+A linha das extensões C tem uma armadilha própria: os `.so` compilados no builder só carregam no runtime se **os dois stages usarem a mesma libc**. Compilar num `python:3.12-slim` (glibc) e copiar para um `python:3.12-alpine` (musl) produz um `ImportError` em runtime que não aparece no build. Veja `escolhendo-base-image.md`.
+
+### Eixo 2 — quantos stages?
+
+**Dois (builder + runtime) é o default.** Resolve o problema central e é o que a maioria dos projetos precisa. Não invente um terceiro sem conseguir nomear o problema que ele resolve.
+
+**Três (deps + build + runtime)** quando dependências e código mudam em ritmos diferentes:
+
+```dockerfile
+# Stage 1 — só dependências. Muda quando o package.json muda: raramente.
+FROM node:20.11.1-slim AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+
+# Stage 2 — build. Muda a cada commit: o tempo todo.
+FROM node:20.11.1-slim AS build
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build
+
+# Stage 3 — runtime. Só o resultado.
+FROM node:20.11.1-slim AS runtime
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+USER node
+CMD ["node", "dist/index.js"]
+```
+
+O ganho é de cache: com o `npm ci` isolado num stage que só depende do `package*.json`, mudar código-fonte não toca o stage `deps`. Em dois stages você consegue quase o mesmo com ordem de instruções — a diferença aparece quando mais de um stage consome as mesmas dependências, como acima.
+
+**Stages extras** (`lint`, `docs`) só se justificam quando algo externo os consome via `--target`:
+
+```bash
+docker build --target lint .
+```
+
+Se ninguém chama esse alvo, o stage é peso morto: mais Dockerfile para ler, mais coisa para manter desatualizada. Um stage não consumido é comentário que finge ser código.
+
+Cada stage custa legibilidade. A pergunta é sempre: *que problema concreto este stage resolve?*
+
+### Eixo 3 — o que atravessa o `COPY --from`
+
+Só o artefato e as dependências de runtime. Nunca o diretório de build inteiro:
+
+```dockerfile
+# Ruim — traz de volta tudo o que o multi-stage tinha descartado
+COPY --from=builder /app /app
+
+# Bom — só o que roda
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+```
+
+O primeiro é o erro mais frustrante de multi-stage: o Dockerfile *parece* correto — tem dois stages, tem `COPY --from` — e a imagem final continua enorme, porque um `COPY` genérico desfez todo o trabalho.
+
+### A heurística de parada
+
+> Se o stage final contém algo que você não executaria em produção — compilador, gerenciador de pacotes, suíte de testes, código-fonte de linguagem compilada — falta um stage. Se você não sabe explicar por que um arquivo está na imagem final, ele não deveria estar.
+
+É a mesma pergunta que o nível 3 do gate de `validacao-de-qualidade.md` faz de forma automatizada.
 
 ## Anatomia comentada de um Dockerfile multi-stage
 
