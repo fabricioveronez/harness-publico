@@ -1,6 +1,6 @@
 ---
 name: docker-practices
-description: "Boas práticas, padrões de qualidade e validação para Dockerfile, imagens Docker e docker-compose. Use esta skill sempre que estiver escrevendo, revisando, otimizando ou validando Dockerfile, .dockerignore, docker-compose.yml, compose.yaml ou executando comandos docker/docker compose — inclui decisão de multi-stage, segurança, camadas, healthchecks, networks, volumes, orquestração local para desenvolvimento e um gate de validação com hadolint, build e execução em compose. Ativar mesmo quando o usuário não pedir explicitamente por 'boas práticas' ou 'validação', bastando que a tarefa envolva criar, revisar ou verificar artefatos Docker."
+description: "Boas práticas, padrões de qualidade e validação para Dockerfile, imagens Docker e docker-compose. Use esta skill sempre que estiver escrevendo, revisando, otimizando ou validando Dockerfile, .dockerignore, docker-compose.yml, compose.yaml ou executando comandos docker/docker compose — inclui decisão de multi-stage, segurança, camadas, healthchecks, networks, volumes, orquestração local para desenvolvimento e um gate de validação com hadolint, build e execução em compose. Ativar mesmo quando o usuário não pedir explicitamente por 'boas práticas' ou 'validação', bastando que a tarefa envolva criar, revisar ou verificar artefatos Docker. O gate roda automaticamente sempre que artefatos Docker forem criados, alterados ou revisados, e a entrega termina num relatório de criação e validação com evidências por nível."
 ---
 
 # Docker Practices
@@ -360,6 +360,17 @@ Verifica o **artefato Docker** — build reproduz, imagem está sã, aplicação
 
 Todo o gate roda sob project name isolado — `PROJ="$(basename "$PWD")-qa"` — que é o que torna o `down -v` seguro.
 
+### Quando executar — automático, sem esperar o pedido
+
+O gate é **parte do trabalho, não um extra opcional**. Dispare-o no mesmo turno, sem perguntar antes, sempre que:
+
+- criar ou alterar `Dockerfile`, `.dockerignore`, `compose.yaml` ou arquivo de override
+- o usuário pedir revisão de artefatos Docker existentes — dizer "está bom" sem rodar o gate é palpite
+
+Validar não é ação destrutiva: roda sob project name isolado e derruba tudo no `trap`. Só interrompa para perguntar se o gate precisar mexer em algo **fora** desse isolamento — parar um container do dev, liberar porta ocupada, apagar volume que não é da validação.
+
+Quando um nível não puder rodar (daemon indisponível, build exige secret ausente, projeto sem `compose.yaml`), **reporte o nível como não executado com o motivo** e siga com os demais. Nunca silencie: nível omitido é lido como nível aprovado.
+
 | # | Nível | Verificação | Falha |
 |---|---|---|---|
 | 1 | Lint | `hadolint` via container, com o `.hadolint.yaml` da skill | para |
@@ -385,6 +396,33 @@ Fail-fast entre níveis.
 
 Comandos exatos, o `.hadolint.yaml` e as armadilhas de cada nível estão em `references/validacao-de-qualidade.md`.
 
+### Relatório de criação e validação
+
+A entrega ao usuário termina **sempre** com um relatório de duas partes. É ele que transforma "criei os arquivos" em "criei e provei que funcionam".
+
+**Parte A — o que foi criado ou alterado.** Um item por arquivo, cada um carregando a decisão de projeto embutida: quantos stages e por quê, base escolhida, usuário de runtime, mecanismo do healthcheck, serviços do compose e como se ordenam. Nunca só "criei o Dockerfile".
+
+**Parte B — o gate**, uma linha por nível:
+
+| # | Nível | Resultado | Evidência |
+|---|---|---|---|
+| 1 | Lint | ✅ | hadolint exit 0, 0 findings |
+| 2 | Build | ✅ | `--target runtime` ok, imagem 66 MB |
+| 3 | Inspeção | ✅ | `USER=app`, forma exec, sem secret em `history`, base pinada |
+| 4 | Subida | ✅ | app e db `healthy` |
+| 5 | Sustentação | ✅ | `RestartCount=0`, `running` após 30s |
+| 6 | Resposta | ✅ | `GET /` → 200 |
+| — | Teardown | ✅ | `down -v`, `docker volume ls` idêntico antes/depois |
+
+Regras do relatório:
+
+- **Evidência, não adjetivo** — `RestartCount=0 após 30s`, não "container estável". O número é a prova; o adjetivo é opinião
+- Nível **não aplicável** entra como `n/a` com a razão (`worker não expõe porta`) — não some da tabela
+- Nível **não executado** entra como `⚠️ não executado` com o motivo
+- Falha vem com a causa provável e o trecho de log ou comando que a evidencia, nunca só ❌
+- Achados **fora do escopo Docker** encontrados no caminho (secret hardcoded no código, dependência de teste no requirements de produção) vão numa seção curta ao final, explicitamente marcados como **não corrigidos**
+- Não anuncie aprovação sem a tabela — o relatório é a prova, não o resumo dela
+
 ---
 
 ## Anti-patterns
@@ -405,3 +443,6 @@ Comandos exatos, o `.hadolint.yaml` e as armadilhas de cada nível estão em `re
 - Validar com `docker compose exec ... curl` — a imagem mínima que a skill manda construir não tem `curl` nem shell
 - `docker compose down -v` sem project name isolado — apaga o volume de dados do desenvolvedor
 - Tratar `up -d` bem-sucedido como aplicação funcionando — restart loop passa despercebido
+- Entregar Dockerfile ou compose sem rodar o gate — "deve funcionar" não é validação
+- Perguntar "quer que eu valide?" — o gate é isolado e não destrutivo, roda por padrão
+- Relatar aprovação sem a tabela de evidências, ou omitir da tabela um nível que não rodou
