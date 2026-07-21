@@ -12,4 +12,4 @@ tags: [moc, runbooks]
 
 | Processo | Plugins | Skills encadeadas | Status |
 |---|---|---|---|
-| [[spec-driven-development]] | spec-driven-development | [[escrever-prd]] → [[preparar-execucao]] → [[implementar-task]] → [[validar-implementacao]] (transversais: [[escrever-trd]], [[revisao-documento-tecnico]]) | rascunho |
+| [[spec-driven-development]] | spec-driven-development | [[escrever-prd]] (opcional) → [[preparar-execucao]] → [[orquestrar-execucao]] (só com 2+ fatias) → [[implementar-task]] → [[validar-implementacao]] (transversais: [[escrever-trd]], [[revisao-documento-tecnico]]) | rascunho |
