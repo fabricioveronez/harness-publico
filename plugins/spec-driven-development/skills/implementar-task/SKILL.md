@@ -7,7 +7,7 @@ description: >
   (o contrato de comportamento: US Rules, Edge cases, critérios de aceite)
   e abre o PRD em `./docs/prds/` **sob demanda** apenas quando o SPEC o
   referencia e é preciso o *porquê* de uma regra; valida o `status` do PRD
-  quando ele existe (`concluído` aborta, `rascunho` confirma, `pronto`
+  quando ele existe (`concluido` aborta, `rascunho` confirma, `pronto`
   transiciona para `em-progresso`, `em-progresso` prossegue). Respeita
   `needs:` entre tasks, executa grupos `[P]` em paralelo quando possível,
   e roda o bloco Validação de cada task. Em falha, entra em loop de
@@ -60,7 +60,7 @@ própria fonte de verdade.
 
 Princípios herdados:
 
-- **Imutabilidade do PRD em `concluído`** — PRD com `status: concluído`
+- **Imutabilidade do PRD em `concluido`** — PRD com `status: concluido`
   não roda. Mudanças de comportamento abrem novo PRD.
 - **IDs estáveis** — IDs de task (`T01`, `T02`...) e de US (`US01`...)
   não mudam. A skill referencia esses IDs em notas de pausa e relatórios.
@@ -69,7 +69,7 @@ Princípios herdados:
   o commit consolida a task inteira quando verde e marca o limite
   entre tasks no histórico do git.
 - **Transição limitada do PRD** — só promove `pronto → em-progresso`.
-  A promoção para `concluído` é da `validar-implementacao`.
+  A promoção para `concluido` é da `validar-implementacao`.
 - **Commit só sob task verde, escopo fechado** — nunca commita com
   passo ou validação falhando, nunca em pausa, e nunca inclui arquivos
   fora de "Arquivos Afetados" do PLAN. Sem `git add -A`.
@@ -102,7 +102,7 @@ antes de iniciar a próxima task elegível.
      o SPEC referencia um PRD que sumiu, **pausar** com `lacuna-spec` e pedir
      que o usuário reconcilie (via `preparar-execucao`) ou ajuste o SPEC.
    - Ler o `status` do PRD:
-     - `concluído` → **abortar**. PRDs concluídos são imutáveis.
+     - `concluido` → **abortar**. PRDs concluídos são imutáveis.
      - `rascunho` → **pedir confirmação explícita** ("PRD ainda em rascunho.
        Executar mesmo assim? Recomendo finalizar via `escrever-prd` antes.").
        Sem confirmação, abortar.
@@ -344,7 +344,7 @@ bloqueadas).
      pausadas, quantas bloqueadas).
    - Tabela de cobertura de USs.
    - Resultado dos critérios técnicos.
-   - Lembrete de que a transição para `concluído` é responsabilidade
+   - Lembrete de que a transição para `concluido` é responsabilidade
      da `validar-implementacao`.
 
 ### 9. Pausa: registro e devolução de controle
@@ -560,9 +560,9 @@ Esta skill **não**:
 - Edita estruturalmente o PLAN ou o TASKS (papel de `preparar-execucao`).
   Só marca `[X]` em passos/validações/títulos e adiciona blocos de
   pausa no `TASKS.md`.
-- Promove o status do PRD/SPEC para `concluído` (papel de
+- Promove o status do PRD/SPEC para `concluido` (papel de
   `validar-implementacao`).
-- Executa em PRD com `status: concluído` (imutável) ou em `rascunho`
+- Executa em PRD com `status: concluido` (imutável) ou em `rascunho`
   sem confirmação explícita.
 - Impõe TDD ou ordem "teste antes do código" — usa testes como sinal
   quando existem, sem ditar estilo.

@@ -14,11 +14,15 @@ dos worktrees de volta na base e libera a próxima onda. É uma camada de
 - Uma decomposição **multi-fatia** com manifesto `./.aidev/{base}-manifest.md`,
   gerada pela `preparar-execucao`. Com **1 fatia** (sem manifesto), não há
   paralelismo a orquestrar — rode `implementar-task` direto no bundle.
+- **Manifesto coerente com os bundles.** A skill valida que cada fatia listada
+  existe como bundle íntegro; incoerência → **aborta** e manda reconciliar via
+  `preparar-execucao`.
 - **Working tree limpo** na base antes de iniciar (a skill cria worktrees a
   partir dela). Estado sujo → aborta pedindo commit/stash.
 - `git` com suporte a `worktree` (Git ≥ 2.5), `user.name`/`user.email` e, quando
-  o projeto exigir, chave de assinatura — o `implementar-task` commita por task
-  dentro de cada worktree e não passa `--no-verify`/`--no-gpg-sign`.
+  o projeto exigir, chave de assinatura. Nem o `implementar-task` disparado nem a
+  própria orquestração passam `--no-verify`, `--no-gpg-sign` ou `--force` — a
+  regra vale também para os **merges e pushes feitos por esta skill**.
 
 ## Dependências externas
 
@@ -26,7 +30,7 @@ dos worktrees de volta na base e libera a próxima onda. É uma camada de
 - Test runner do projeto (indireto) — cada `implementar-task` disparado usa o
   `Comando de teste:` do PLAN da fatia, como no fluxo normal.
 
-## Como funciona (resumo)
+### Como funciona (resumo)
 
 1. Lê o manifesto e valida que cada fatia existe como bundle coerente.
 2. Confere pré-condições de git (working tree limpo, sem worktrees órfãos).
@@ -39,6 +43,19 @@ dos worktrees de volta na base e libera a próxima onda. É uma camada de
 6. Reentrante: reinvocar retoma das fatias/ondas pendentes pelo estado dos
    `TASKS.md`.
 
+### Estados de fatia no relatório
+
+| Estado | Significado |
+|---|---|
+| **concluída** | todas as tasks `[X]`, branch mergeada na base |
+| **pausada** | o `implementar-task` da fatia pausou; o motivo acompanha o estado |
+| **bloqueada** | alguma `needs` não concluiu; o relatório diz por qual fatia |
+| **pendente** | ainda não entrou em nenhuma onda executada |
+
+Erro fatal ao **criar o worktree ou disparar** a fatia (path ocupado, branch já
+existe) é reportado como **erro de orquestração**, não como falha de código: as
+demais fatias da onda seguem, e a skill sugere limpar os worktrees órfãos.
+
 ## Skills relacionadas
 
 - **preparar-execucao** — gera as fatias e o manifesto que esta skill consome; é
@@ -46,8 +63,8 @@ dos worktrees de volta na base e libera a próxima onda. É uma camada de
   para ela.
 - **implementar-task** — a unidade de trabalho disparada por fatia (uma
   instância por bundle, isolada em worktree). Esta skill só faz o fan-out.
-- **validar-implementacao** — fecha o ciclo depois. Esta skill **para na
-  implementação**; não valida nem promove status.
+- **validar-implementacao** — fecha o ciclo depois, **uma invocação por fatia**.
+  Esta skill **para na implementação**; não valida nem promove status.
 
 ## Exemplos de uso
 
@@ -69,7 +86,7 @@ Dispara as implementações em paralelo
   era disjunta (corte ruim); a skill para e manda reconciliar via
   `preparar-execucao`.
 - **Não valida nem fecha o ciclo** — a validação código↔contrato e a promoção de
-  status para `concluído` são da `validar-implementacao`.
+  status para `concluido` são da `validar-implementacao`.
 - **Não decide a decomposição** — corte, grafo e manifesto são da
   `preparar-execucao`; esta skill só lê o manifesto.
 - **Não roda com 1 fatia** — sem manifesto não há paralelismo; use
@@ -78,3 +95,10 @@ Dispara as implementações em paralelo
   seguem; o progresso commitado da fatia pausada é mergeado e ela é retomável.
 - **Merge é sequencial ao fim da onda** — o paralelismo real está na fase de
   trabalho de cada fatia, não no merge (que escreve no HEAD da base).
+
+### Referências da skill
+
+- `references/isolamento-e-merge.md` — criação dos worktrees, política de merge
+  e limpeza.
+- `references/template-relatorio.md` — formato do relatório de ondas e estados
+  de fatia.

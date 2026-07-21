@@ -28,7 +28,7 @@ do TRD (carregado junto na implementação). O campo de referências conecta PRD
 recursos externos quando necessário.
 
 A skill cobre tanto a criação do PRD quanto a edição de PRDs existentes que ainda
-não foram concluídos — PRDs com `status: concluído` são imutáveis e não devem ser
+não foram concluídos — PRDs com `status: concluido` são imutáveis e não devem ser
 editados por esta skill.
 
 ## Papel do PRD no fluxo
@@ -40,7 +40,7 @@ O PRD cumpre dois papéis:
 
 Princípios que decorrem disso:
 
-- **Imutabilidade em `concluído`** — quando o status chega a `concluído`, o PRD congela e vira registro histórico. Mudanças posteriores de comportamento devem abrir um novo PRD, não editar um concluído
+- **Imutabilidade em `concluido`** — quando o status chega a `concluido`, o PRD congela e vira registro histórico. Mudanças posteriores de comportamento devem abrir um novo PRD, não editar um concluído
 - **Progressive disclosure via `depends_on`** — dependências entre PRDs são declaradas explicitamente; o agente só lê um PRD dependente quando o contexto da implementação exigir
 - **Separação de responsabilidades** — PRD cobre comportamento e regra de negócio; TRD e ADR cobrem restrições técnicas, stack e decisões de arquitetura. O PRD **referencia** o artefato técnico, mas não o **dirige, dimensiona nem rastreia** — a forma do PRD é decidida pelo produto, não pela execução
 - **IDs estáveis** — USs e Milestones recebem IDs (US01, Milestone 1...) que não mudam após atribuídos, porque artefatos futuros (planejamento, tasks) referenciam por esses IDs
@@ -67,7 +67,7 @@ Antes de tudo, identificar se a solicitação é de **criação** ou **edição*
 
 No modo edição:
 1. Ler o PRD referenciado em `./docs/prds/`
-2. Verificar o `status` — se for `concluído`, interromper e avisar o usuário que PRDs concluídos são imutáveis e mudanças de comportamento devem abrir um novo PRD
+2. Verificar o `status` — se for `concluido`, interromper e avisar o usuário que PRDs concluídos são imutáveis e mudanças de comportamento devem abrir um novo PRD
 3. Para PRDs em `rascunho`, `pronto` ou `em-progresso`, prosseguir com a edição preservando `prd_number`, IDs de US e Milestones já atribuídos
 
 ### 2. Análise de Escopo e Lacunas Bloqueantes
@@ -142,7 +142,7 @@ Regras de geração:
 - A seção "Referências" lista links para documentação, issues, PRDs relacionados, APIs, designs ou recursos externos mencionados no contexto
 - O campo `references` no frontmatter deve conter os mesmos links da seção Referências em formato de lista
 - IDs de US (US01, US02...) e de Milestone (Milestone 1, 2...) são estáveis — uma vez atribuídos não mudam, pois artefatos futuros (planejamento, tasks) referenciam por esses IDs
-- No modo criação, o `status` inicial ao salvar é sempre `rascunho`. No modo edição, preservar o `status` atual do PRD — transições entre `pronto`, `em-progresso` e `concluído` são feitas por skills futuras de planejamento e execução
+- No modo criação, o `status` inicial ao salvar é sempre `rascunho`. No modo edição, preservar o `status` atual do PRD — transições entre `pronto`, `em-progresso` e `concluido` são feitas por skills futuras de planejamento e execução
 
 ### 4. Mapeamento de Dependências
 

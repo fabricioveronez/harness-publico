@@ -30,7 +30,7 @@ Fronteira — o que **não** entra no SPEC (vive no PRD, quando existe):
 
 ## Formato: Open Knowledge Format (OKF)
 
-O trio `spec`/`plan`/`tasks` segue o **OKF**: markdown com YAML frontmatter, onde o
+O bundle `spec`/`plan`/`tasks` segue o **OKF**: markdown com YAML frontmatter, onde o
 único campo **obrigatório** é `type`. Todos os outros campos são **convenção desta
 skill** — mantidos para rastreabilidade e ciclo de vida, não por exigência do
 formato. Cross-links entre documentos são links markdown comuns.

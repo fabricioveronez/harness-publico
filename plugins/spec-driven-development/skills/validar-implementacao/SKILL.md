@@ -14,7 +14,7 @@ description: >
   qualquer ajuste. Rework estrutural de PLAN/TASKS é delegado à
   `preparar-execucao`; gap de código é reportado (e pode voltar à
   `implementar-task`). Ao concluir sem divergência aberta, promove o `status`
-  para `concluido` no frontmatter do trio (e o PRD para `concluído` quando
+  para `concluido` no frontmatter do bundle (e o PRD para `concluido` quando
   existe). Use quando o usuário quiser validar a implementação, fechar o ciclo,
   verificar se o código bate com a spec/PRD, detectar e ajustar drift entre
   documento e código, auditar a coerência da entrega, ou mencionar "validar
@@ -150,7 +150,7 @@ as grandes foram resolvidas pelo usuário ou delegadas e sanadas):
 
 1. Promover `status: concluido` no frontmatter de `SPEC.md`, `PLAN.md`
    (`status`) e `TASKS.md` (`plan_status`). Editar **apenas o frontmatter**.
-2. Quando há PRD, promover o PRD para `status: concluído` (via edição de
+2. Quando há PRD, promover o PRD para `status: concluido` (via edição de
    frontmatter — a única transição de status do PRD que esta skill faz).
 3. O bundle **permanece no lugar** (`./.aidev/{slug}/`), congelado pelo status
    como registro do que foi construído.
@@ -179,7 +179,7 @@ Esta skill **não**:
 - Edita código para sanar gap de implementação (papel de `implementar-task`).
 - Reestrutura PLAN/TASKS (papel de `preparar-execucao`).
 - Edita o corpo do PRD (papel de `escrever-prd`) — só promove o `status` do PRD
-  para `concluído` no fechamento.
+  para `concluido` no fechamento.
 - Ajusta divergência **grande** sem confirmação explícita do usuário.
 - Move ou apaga o bundle — o fechamento é por `status`, no lugar.
 
