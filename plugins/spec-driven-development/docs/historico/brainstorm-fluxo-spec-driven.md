@@ -1,5 +1,7 @@
 # Brainstorm — Fluxo de desenvolvimento spec-driven
 
+> **Documento histórico — não é fonte de verdade.** Registro da sessão de brainstorm que originou o plugin, preservado como estava. As skills descritas aqui como "a criar" já existem, e parte do vocabulário deste texto está morto (`aprovado`, `em-implementacao`, `criar-trd`, `criar-adr`, "SPEC = PRD"). Para o comportamento atual, leia os docs em `plugins/spec-driven-development/docs/` e o runbook em `runbooks/spec-driven-development.md`.
+
 Documento de registro do brainstorm realizado para definir um fluxo próprio de desenvolvimento spec-driven, integrado ao marketplace de plugins. Nenhuma skill será criada a partir deste documento — ele serve como referência para quando a implementação for iniciada.
 
 ---
