@@ -125,7 +125,7 @@ Para cada critério da tabela "Critérios de Aceite":
 
 ### Importante
 
-O gate final **não promove o status para `concluído`** mesmo que tudo
+O gate final **não promove o status para `concluido`** mesmo que tudo
 passe — essa transição é responsabilidade da `validar-implementacao`, no
 fechamento. O gate só reporta o estado.
 

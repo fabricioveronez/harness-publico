@@ -294,7 +294,7 @@ Se a decisão substitui uma anterior, identificar o ADR antigo:
 
 ADR `aceito` é imutável, exceto o `status` quando outro ADR o supersede. Revisar uma decisão
 nunca é editar o ADR — é criar um novo com `supersedes` apontando para o antigo. Mesma
-disciplina da imutabilidade do PRD `concluído`.
+disciplina da imutabilidade do PRD `concluido`.
 
 ## Templates de referência
 

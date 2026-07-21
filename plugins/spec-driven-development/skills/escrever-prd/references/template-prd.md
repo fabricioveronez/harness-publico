@@ -32,9 +32,9 @@ Aplicando:
 - `rascunho` — em criação ou revisão, ainda não aprovado
 - `pronto` — aprovado, aguardando planejamento/execução
 - `em-progresso` — execução ativa (transição feita pela skill de planejamento/execução)
-- `concluído` — feature entregue; **o PRD congela e vira registro histórico imutável**. Alcançado quando **todos os milestones têm o checklist de aceite aprovado**. A transição em si é feita por quem aprova/executa, **não por esta skill** (que não faz transição de estado)
+- `concluido` — feature entregue; **o PRD congela e vira registro histórico imutável**. Alcançado quando **todos os milestones têm o checklist de aceite aprovado**. A transição em si é feita por quem aprova/executa, **não por esta skill** (que não faz transição de estado)
 
-Quando um PRD chega em `concluído`, ele não é mais editado. Mudanças de comportamento posteriores abrem um novo PRD que pode referenciar o original via `depends_on`.
+Quando um PRD chega em `concluido`, ele não é mais editado. Mudanças de comportamento posteriores abrem um novo PRD que pode referenciar o original via `depends_on`.
 
 **`depends_on`** — grafo de rastreabilidade entre PRDs:
 
@@ -48,7 +48,7 @@ Quando um PRD chega em `concluído`, ele não é mais editado. Mudanças de comp
 ```markdown
 ---
 prd_number: "NNN"
-status: rascunho | pronto | em-progresso | concluído
+status: rascunho | pronto | em-progresso | concluido
 priority: baixa | média | alta | crítica
 created: YYYY-MM-DD
 issue: "#número (opcional)"
@@ -225,5 +225,5 @@ designs, ou qualquer recurso externo relevante para o negócio da feature.]
 
 [Registra decisões **de produto** e premissas de negócio significativas. Decisão
 técnica/arquitetural vai para ADR, não aqui. Seção viva durante `rascunho`, `pronto`
-e `em-progresso`; congela junto com o PRD quando o status vira `concluído`.]
+e `em-progresso`; congela junto com o PRD quando o status vira `concluido`.]
 ```

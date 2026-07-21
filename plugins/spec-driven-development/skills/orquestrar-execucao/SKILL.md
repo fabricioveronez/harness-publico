@@ -197,7 +197,7 @@ Esta skill **não**:
   (papel de `preparar-execucao`).
 - Edita SPEC/PLAN/TASKS/PRD, marca `[X]` ou cria commits de task (o
   `implementar-task` faz isso dentro de cada worktree).
-- Valida a implementação nem promove status para `concluído` (papel de
+- Valida a implementação nem promove status para `concluido` (papel de
   `validar-implementacao`).
 - Resolve conflitos de merge (conflito = corte não-disjunto → reconciliar).
 - Roda quando há só 1 fatia (sem manifesto) — nesse caso, `implementar-task`
