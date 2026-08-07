@@ -146,10 +146,28 @@ def parse_tasks(texto: str) -> dict:
     }
 
 
+def secao_md(texto: str, titulo_parcial: str) -> str:
+    """Conteúdo de uma seção `## Titulo` até o próximo `##`."""
+    marcas = list(re.finditer(r"^##\s+(.+?)\s*$", texto, re.MULTILINE))
+    for i, m in enumerate(marcas):
+        if titulo_parcial.lower() in m.group(1).lower():
+            fim = marcas[i + 1].start() if i + 1 < len(marcas) else len(texto)
+            return texto[m.end():fim]
+    return ""
+
+
 def parse_manifesto(texto: str) -> dict:
+    """Lê só a tabela da seção `## Fatias`.
+
+    O manifesto tem outras tabelas — critérios de aceite do conjunto, rollup de
+    marcos, fechamento. Varrer o arquivo inteiro faria cada linha delas virar uma
+    'fatia' inexistente, e o conjunto seria reportado como incoerente, travando a
+    orquestração de qualquer decomposição gerada pelo template completo.
+    """
     fatias, ondas = [], {}
+    bloco_fatias = secao_md(texto, "Fatias") or texto
     dentro_tabela = False
-    for m in RE_LINHA_FATIA.finditer(texto):
+    for m in RE_LINHA_FATIA.finditer(bloco_fatias):
         primeiro = m.group(1).strip()
         resto = [c.strip() for c in m.group(2).split("|")]
         if primeiro.lower().startswith("fatia") or set(primeiro) <= {"-", ":"}:

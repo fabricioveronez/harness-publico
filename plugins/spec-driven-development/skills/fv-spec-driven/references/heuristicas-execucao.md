@@ -125,7 +125,7 @@ próprios de arquivo, rota e símbolo (`/api/cards`, `CardService`).
 
 | Valor de `Nível` | Tipo |
 |---|---|
-| `código novo`, `implementação`, `feature`, `API`, `UI`, `CLI` | `feat` |
+| `usuário`, `usuario`, `código novo`, `implementação`, `feature`, `API`, `UI`, `CLI` | `feat` |
 | `refatoração`, `refactor` | `refactor` |
 | `infra`, `configuração`, `config`, `build`, `ci`, `tooling` | `chore` |
 | `documento`, `documentação`, `docs` | `docs` |

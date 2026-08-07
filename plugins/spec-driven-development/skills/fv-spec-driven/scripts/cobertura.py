@@ -100,8 +100,31 @@ def tasks_do_bundle(tasks_txt: str) -> list[dict]:
     return out
 
 
+def alvos_fora_do_plan(criterios: list[dict], plan_txt: str) -> list[dict]:
+    """Alvo de teste precisa estar em 'Arquivos Afetados'.
+
+    O commit por task inclui só a interseção entre 'Arquivos Afetados' e o que
+    mudou. Um arquivo de teste não declarado ali não pode ser criado pela task —
+    ficaria fora do commit e deixaria o working tree sujo. O efeito prático é um
+    critério automatizável que vira teste que ninguém escreve, com o gate passando
+    por conta da suíte que já existia.
+    """
+    bloco = secao(plan_txt, "Arquivos Afetados")
+    declarados = set(re.findall(r"`([^`]+)`", bloco))
+    out = []
+    for c in criterios:
+        alvo = c["alvo"].strip()
+        # só cobra caminho de arquivo; comando solto (`npm test`) não se declara
+        if not c["automatizavel"] or not alvo or "/" not in alvo or " " in alvo:
+            continue
+        if not any(alvo == d or alvo in d or d in alvo for d in declarados):
+            out.append({"tipo": "alvo-fora-de-arquivos-afetados", "id": c["id"], "detalhe": alvo})
+    return out
+
+
 def monta(bundle: Path) -> dict:
     spec_txt, tasks_txt = ler(bundle / "SPEC.md"), ler(bundle / "TASKS.md")
+    plan_txt = ler(bundle / "PLAN.md")
     if not spec_txt or not tasks_txt:
         return {"erro": f"bundle incompleto em {bundle} (falta SPEC.md ou TASKS.md)"}
 
@@ -133,6 +156,23 @@ def monta(bundle: Path) -> dict:
         if not t["cas"]:
             lacunas.append({"tipo": "task-sem-criterio", "id": t["id"],
                             "detalhe": "bloco Validação não referencia nenhum CA"})
+    lacunas.extend(alvos_fora_do_plan(criterios, plan_txt))
+
+    # Alvo que é a suíte inteira não distingue "este critério passa" de "a suíte
+    # passa" — um smoke test verde faria o critério passar sem tocar no
+    # comportamento contratado. Aviso, não lacuna: às vezes é legítimo (o critério
+    # É "a suíte continua verde", típico de refatoração).
+    for c in criterios:
+        alvo = c["alvo"].strip().strip("`")
+        if not c["automatizavel"] or not alvo:
+            continue
+        tem_caminho = "/" in alvo or re.search(r"\.\w+$", alvo.split()[-1] if alvo.split() else "")
+        tem_filtro = re.search(r"(--\s*\w|-k\b|--grep|--filter|::)", alvo)
+        if not tem_caminho and not tem_filtro:
+            avisos.append(
+                f"{c['id']}: alvo «{alvo}» roda a suíte inteira — não distingue este "
+                "critério de qualquer outro teste verde. Aponte o arquivo ou um filtro."
+            )
 
     automatizaveis = [c for c in criterios if c["automatizavel"]]
     return {

@@ -136,10 +136,18 @@ em vez de reescrever o critério em prosa:
   - [ ] CA03
 ```
 
+**Todo `Alvo` de teste precisa aparecer em "Arquivos Afetados" do PLAN.** Essa é a
+costura entre o critério e a execução: o commit por task só inclui a interseção
+entre "Arquivos Afetados" e o que mudou, então um arquivo de teste que não está
+declarado ali **não pode ser criado pela task** — ficaria de fora do commit e o
+working tree acabaria sujo. Na prática, um critério automatizável cujo alvo não
+está declarado vira um teste que ninguém escreve, e o gate final passa porque só
+sobrou a suíte que já existia.
+
 Rode `python3 scripts/cobertura.py --bundle .aidev/{slug}` antes de gravar. Ele
-acusa US sem task, critério sem task, task sem critério e referência a ID
-inexistente. Lacuna aqui é barata; lacuna descoberta no gate final custa uma
-execução inteira.
+acusa US sem task, critério sem task, task sem critério, critério automatizável
+sem alvo e referência a ID inexistente. Lacuna aqui é barata; lacuna descoberta no
+gate final custa uma execução inteira.
 
 ### Verticalização e paralelismo de task
 
