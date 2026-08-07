@@ -38,13 +38,32 @@ Leia o documento inteiro e trate-o como **insumo, não como contrato**: ele carr
 raciocínio, alternativas descartadas e pendências em aberto — nada disso entra no
 SPEC. O que entra é o comportamento decidido.
 
-Duas coisas merecem atenção nesse tipo de documento:
+Três coisas merecem atenção nesse tipo de documento:
 
 - **Decisão registrada ≠ requisito.** "Descartamos webhook em favor de polling" é
   contexto técnico (vai para o PLAN, ou vira ADR via `escrever-trd`), não Rule.
+
 - **Pendência em aberto é lacuna, não premissa livre.** Se o documento diz
   explicitamente que algo não foi decidido, não decida por ele em silêncio.
   Pergunte, ou registre como premissa **visível** no SPEC e sinalize no resumo.
+
+- **Alternativa descartada é restrição negativa.** Documento de brainstorm costuma
+  ter uma seção do tipo "alternativas descartadas" — e ela vale tanto quanto a
+  seção de decisões, só que ao contrário: diz o que o projeto **decidiu não
+  fazer**, e normalmente com o argumento. Antes de gravar, releia essa seção e
+  confira se nenhuma Rule ou Edge case reintroduziu um item de lá.
+
+  Esse é o modo de falha mais difícil de enxergar na revisão, porque ele não
+  chega como contradição frontal: chega como Edge case defensivo, razoável
+  isolado, que devolve pela porta lateral exatamente o que foi descartado pela
+  porta da frente. Um documento que diz "trocamos abortar por replanejar" e
+  "sem teto de replanejamento" está sendo contrariado por um Edge case que diz
+  "divergência irrecuperável → falha explícita, não replaneja em loop" — e essa
+  Edge case parece prudência, não reversão.
+
+  Se a reversão for mesmo necessária, ela é legítima — mas é **decisão nova**:
+  registre como premissa visível nomeando qual decisão da fonte está sendo
+  revertida e por quê. O que não pode é entrar calada.
 
 O `prd:` do bundle fica `none`; o SPEC é a fonte de verdade.
 
@@ -97,9 +116,16 @@ Decida **quantas fatias** antes de gerar qualquer arquivo. Fatia é a unidade de
 4. **Ondas** saem do grafo: fatia sem `needs` entra na onda 1; a onda de uma fatia
    com `needs` é `1 + max(onda das dependências)`.
 
-5. **Apresente o corte e espere aprovação.** Liste fatia, USs cobertas, marco,
-   `needs`/`[P]` e o que roda em paralelo. Mudar o corte depois custa retrabalho —
-   este é o momento barato.
+5. **Meça o paralelismo efetivo: fatias ÷ ondas.** Cortar em 5 fatias que rodam em
+   4 ondas entrega 1,25× — quase sequencial, mas pagando worktree, merge e
+   consolidação de memória em cima. Abaixo de ~1,5, apresente o número junto do
+   corte e pergunte se o custo se paga ou se é melhor menos fatias (ou uma só).
+   É o mesmo alerta da cadeia linear longa de tasks, um nível acima: cadeia longa
+   entre fatias é decomposição que só parece paralela.
+
+6. **Apresente o corte e espere aprovação.** Liste fatia, USs cobertas, marco,
+   `needs`/`[P]`, o que roda em paralelo e o paralelismo efetivo. Mudar o corte
+   depois custa retrabalho — este é o momento barato.
 
 ## 5. Gerar (em lote atômico)
 
@@ -143,6 +169,11 @@ declarado ali **não pode ser criado pela task** — ficaria de fora do commit e
 working tree acabaria sujo. Na prática, um critério automatizável cujo alvo não
 está declarado vira um teste que ninguém escreve, e o gate final passa porque só
 sobrou a suíte que já existia.
+
+Rode `python3 scripts/paralelismo.py . --fonte <doc-de-origem>` depois de gravar: ele
+confirma que as fatias de cada onda são de fato disjuntas (é o que o merge
+pressupõe), calcula o paralelismo efetivo, e confere se as capacidades, regras e
+pendências da fonte aparecem nos artefatos.
 
 Rode `python3 scripts/cobertura.py --bundle .aidev/{slug}` antes de gravar. Ele
 acusa US sem task, critério sem task, task sem critério, critério automatizável

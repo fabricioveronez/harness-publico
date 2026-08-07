@@ -80,6 +80,9 @@ O que foi presumido ao projetar (do PRD) ou autorar (sem PRD). Premissa errada
 volta ao modo Preparar para ajuste.
 
 - [premissa 1]
+- [premissa que fecha uma pendência da fonte — nomeie a pendência, a alternativa
+  adotada e o caminho de reversão]
+- [premissa que **reverte** uma decisão da fonte — nomeie qual decisão e por quê]
 
 ## Referências
 
@@ -105,3 +108,9 @@ volta ao modo Preparar para ajuste.
   reintroduz o peso de contexto que o SPEC existe para resolver.
 - **Escopo da fatia.** O SPEC projeta **apenas as USs desta fatia**; as demais
   moram nos SPECs das irmãs.
+- **Premissa viaja com a consequência.** Se uma Rule desta fatia é consequência de
+  uma premissa registrada na fatia irmã, repita a premissa aqui (ou aponte para
+  ela). Cada bundle é lido isolado — pelo modo Implementar, por um subagente numa
+  onda, por quem revisa só aquela fatia. Uma decisão declarada em `toil-sync` que
+  aparece como fato liso numa Rule de `toil-painel` some para todos esses leitores,
+  e o que era premissa reversível vira requisito aparente.

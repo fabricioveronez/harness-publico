@@ -204,6 +204,7 @@ Rodam sem entrar em contexto. Use-os em vez de reimplementar a mecânica em pros
 | `scripts/worktree.py` | cria / mergeia onda / limpa worktrees e branches |
 | `scripts/memory_fold.py` | consolida `docs/.memory/*.md` em `docs/MEMORY.md` |
 | `scripts/cobertura.py` | tabela US × critério de aceite × task |
+| `scripts/paralelismo.py` | disjunção real entre fatias e paralelismo efetivo do corte |
 
 Todos usam só a biblioteca padrão do Python 3 e aceitam `--help`.
 
