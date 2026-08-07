@@ -36,3 +36,15 @@ Antes, a classificação de um critério em automatizável ou manual era feita p
 | `cobertura.py` | tabela US × critério de aceite × task |
 
 Todos usam só a biblioteca padrão do Python 3.
+
+## Skills legadas
+
+As quatro skills que este ciclo substitui — `preparar-execucao`,
+`orquestrar-execucao`, `implementar-task` e `validar-implementacao` — vivem em
+`plugins/spec-driven-development/legacy/`, fora de `skills/`.
+
+Ficam preservadas para consulta e histórico, mas **fora do diretório de skills**:
+enquanto estavam lá, disputavam com esta as mesmas frases de acionamento
+("implementa as tasks", "valida a implementação", "prepara a execução"), sem que
+houvesse como escolher qual acordaria. Ver `legacy/README.md` para o mapa de
+migração e as notas de compatibilidade de bundle.
