@@ -90,6 +90,20 @@ A última nota de pausa carrega um `Snapshot` com o **hash** do conteúdo do
 git hash-object .aidev/{slug}/SPEC.md   # ou: shasum -a 256 <arquivo> | cut -c1-12
 ```
 
+**O hash do `TASKS.md` sai da versão em HEAD, não do disco:**
+
+```bash
+git show HEAD:.aidev/{slug}/TASKS.md | git hash-object --stdin | cut -c1-12
+```
+
+O motivo é que o snapshot é gravado *dentro* do `TASKS.md`, junto com a nota de
+pausa e os `[X]` do passo. Tirar o hash do disco criaria uma referência
+circular: o arquivo muda ao registrar a própria pausa, e toda retomada acusaria
+"TASKS alterado desde a pausa" por uma escrita que o próprio protocolo fez,
+mandando o usuário conferir um diff que ele nunca produziu. O que interessa
+detectar é edição **externa** entre invocações, e é isso que a versão em HEAD
+isola.
+
 Use hash de conteúdo, **não `mtime`**. `git checkout`, `git worktree add` e clone
 reescrevem o timestamp sem alterar uma linha do arquivo — e num fluxo que cria
 worktree por fatia, o `mtime` acusaria drift no SPEC de toda fatia, toda onda,

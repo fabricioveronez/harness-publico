@@ -32,13 +32,28 @@ Localize `Comando de teste:` no PLAN. Se vier `Sem suíte de testes detectada`,
 marque `sem_suite = true` e pule as otimizações de teste — o bloco `Validação:`
 continua sendo o gate, e o commit por task continua saindo.
 
-Cheque o working tree (`git status --porcelain`):
+Cheque o working tree (`git status --porcelain`). Antes de classificar, separe os
+**artefatos do próprio ciclo** — eles nunca são "arquivos alheios":
 
-- **limpo** → siga;
-- **sujo com mudanças fora do escopo da próxima task** → pausa `working-tree-sujo`.
-  O usuário decide (commit à parte, stash, descarte) e reinvoca;
-- **sujo só com arquivos do escopo** (retomada após pausa que deixou edição
-  parcial) → siga; o commit da task consolida.
+| Sempre do escopo, por construção | Por quê |
+|---|---|
+| `.aidev/{slug}/*.md` | notas de pausa, `[X]` e transição de status escritos pelo próprio fluxo |
+| `docs/MEMORY.md` ou `docs/.memory/{fatia}.md` | escrito no protocolo de pausa e no gate final |
+| arquivos de "Arquivos Afetados" tocados pela task em pausa | edição parcial que a pausa deixou de propósito |
+
+Isso não é conveniência. A pausa **proíbe commit** (regra: commit só sob task
+verde), então ela necessariamente deixa esses três sujos. Se a invocação seguinte
+os tratasse como alheios, pausaria com `working-tree-sujo` por arquivos que ela
+mesma escreveu — e cada retomada geraria mais um, num laço que só sai com commit
+manual. A classificação tem que ser determinística aqui, não um julgamento que
+pode variar entre execuções.
+
+Com os artefatos do ciclo separados, o que sobra:
+
+- **nada sobrou** → siga;
+- **sobrou algo fora de "Arquivos Afetados"** → pausa `working-tree-sujo`, listando
+  na nota **apenas o que sobrou**. O usuário decide (commit à parte, stash,
+  descarte) e reinvoca.
 
 ## 2. Avaliar skills relevantes
 
@@ -56,9 +71,21 @@ Se nada casar, siga sem carga adicional. É sugestão, não trava.
 
 ## 3. Linha de base verde
 
-Com `sem_suite = false`, rode a suíte completa antes da próxima task. Vermelho →
-pausa `falha-pre-existente`. Falha que já existia contamina o diagnóstico dos
-ciclos de correção — você passaria 5 ciclos consertando algo que não quebrou aqui.
+Com `sem_suite = false`, rode a suíte completa antes da próxima task.
+
+Vermelho **não** é automaticamente `falha-pre-existente`. Separe primeiro:
+
+- Falha **nos alvos dos critérios deste bundle**, ou em módulo que a task ainda vai
+  criar (`[NOVO]` em "Arquivos Afetados") → **esperado**. Siga. Um bundle cujo
+  contrato já tem teste escrito e cujo código ainda não existe começa vermelho por
+  definição; tratar isso como falha pré-existente tornaria todo bundle greenfield
+  inexecutável já na primeira task.
+- Falha **fora** desse conjunto → pausa `falha-pre-existente`. É o caso que
+  importa: falha alheia contamina o diagnóstico dos ciclos, e você gastaria as
+  cinco tentativas consertando algo que a task não quebrou.
+
+Registre na saída quais falhas você classificou como esperadas e por quê — se a
+lista crescer entre invocações, alguma regressão entrou disfarçada de "esperada".
 
 Promova o bundle na primeira task da cadeia:
 
@@ -106,6 +133,15 @@ com filtro seletivo (seção 2 de `heuristicas-execucao.md`).
   o item e siga. Vermelho: `regressao-fora-escopo`, **sem consumir ciclo**, pausa.
 - **Vermelho no seletivo** → consome 1 ciclo. Esgotou os 5 → pausa
   `esgotamento-ciclos`.
+
+**O orçamento de 5 ciclos não reinicia na retomada.** Ele é por task, não por
+invocação. A nota de pausa lista as tentativas justamente para a próxima
+invocação não repeti-las; se o contador zerasse, uma task com alvo insatisfazível
+viraria moto-perpétuo — cinco tentativas novas a cada "continua", para sempre.
+Ao retomar uma task que já esgotou, você tem duas saídas honestas: uma abordagem
+genuinamente nova (que a nota anterior não lista) ou reclassificar a causa. Quando
+a releitura mostra que o problema é do contrato e não do código, o motivo certo é
+`lacuna-spec` — não mais um `esgotamento-ciclos`.
 
 Cada ciclo começa lendo o erro atual e os diffs das tentativas anteriores **na
 mesma task**. Não repita correção já tentada. Se perceber que está variando a

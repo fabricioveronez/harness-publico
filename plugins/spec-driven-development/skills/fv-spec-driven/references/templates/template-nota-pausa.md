@@ -22,8 +22,13 @@ não repetir a mesma correção na retomada seguinte.
 O `Snapshot` guarda **hash de conteúdo**, não `mtime`:
 
 ```bash
-git hash-object .aidev/{slug}/SPEC.md | cut -c1-12
+git hash-object .aidev/{slug}/SPEC.md | cut -c1-12                    # SPEC: do disco
+git show HEAD:.aidev/{slug}/TASKS.md | git hash-object --stdin | cut -c1-12   # TASKS: de HEAD
 ```
+
+O `TASKS.md` sai de **HEAD**, não do disco, porque o snapshot é gravado dentro
+dele: tirar do disco faria toda retomada acusar drift no TASKS por causa da
+própria nota que acabou de ser escrita.
 
 `git checkout`, `git worktree add` e clone reescrevem timestamp sem mudar uma
 linha. Com `mtime`, toda fatia de toda onda paralela acusaria drift no SPEC e a
