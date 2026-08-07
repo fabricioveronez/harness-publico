@@ -125,12 +125,16 @@ próprios de arquivo, rota e símbolo (`/api/cards`, `CardService`).
 
 | Valor de `Nível` | Tipo |
 |---|---|
-| `usuário`, `usuario`, `código novo`, `implementação`, `feature`, `API`, `UI`, `CLI` | `feat` |
+| `usuário`, `usuario`, `API`, `componente`, `código novo`, `implementação`, `feature`, `UI`, `CLI` | `feat` |
 | `refatoração`, `refactor` | `refactor` |
 | `infra`, `configuração`, `config`, `build`, `ci`, `tooling` | `chore` |
 | `documento`, `documentação`, `docs` | `docs` |
 | `teste`, `testes`, `cobertura`, `qa` | `test` |
 | `correção`, `bugfix`, `fix`, `hotfix` | `fix` |
+
+Os três valores que o `template-tasks.md` declara — `usuário`, `API`, `componente`
+— estão todos aqui de propósito: um valor legítimo do template caindo no fallback
+seria bug da tabela, não do autor da task.
 
 Sem casamento → `chore`, **com aviso** ao usuário sugerindo padronizar o campo.
 Nunca infira um tipo "parecido" por proximidade textual.
@@ -138,21 +142,30 @@ Nunca infira um tipo "parecido" por proximidade textual.
 ### Arquivos incluídos
 
 A interseção entre "Arquivos Afetados" do PLAN e o que `git status --porcelain`
-mostra como modificado, **mais**:
+mostra como modificado, **mais tudo que o próprio fluxo escreveu**:
 
 - `.aidev/{slug}/TASKS.md` — carrega os `[X]` novos, e é o que faz o histórico
   refletir o progresso;
 - o arquivo de memória da execução (`docs/MEMORY.md`, ou
-  `docs/.memory/{base}-{fatia}.md` dentro de um worktree).
+  `docs/.memory/{base}-{fatia}.md` dentro de um worktree);
+- `SPEC.md` e `PLAN.md` do bundle **quando houve transição de status** nesta
+  invocação (o `transicao.py` escreve nos três arquivos ao promover para
+  `em-execucao`).
 
-A memória entra por necessidade, não por capricho: fora do commit ela deixa o
-working tree sujo, e a invocação seguinte pausa com `working-tree-sujo` por um
-arquivo que o próprio fluxo escreveu — laço que só sai com commit manual. Dentro
-de um worktree é pior: `git worktree remove` recusa sair sujo e a limpeza da onda
-quebra.
+A regra por trás dos três é a mesma: **arquivo que o fluxo escreveu, o fluxo
+commita**. Fora do commit ele deixa o working tree sujo, e a invocação seguinte
+pausa com `working-tree-sujo` por um arquivo que ninguém pediu — laço que só sai
+com commit manual. Dentro de um worktree é pior: `git worktree remove` recusa sair
+sujo e a limpeza da onda quebra.
+
+O que a regra **não** afrouxa: arquivo de código fora de "Arquivos Afetados"
+continua sendo incoerência, e a saída é reconciliar no modo Preparar. A exceção
+vale só para os artefatos de controle do próprio ciclo.
 
 ```bash
 git add <arquivos-do-escopo> .aidev/{slug}/TASKS.md <arquivo-de-memoria>
+# se houve transição de status nesta invocação, os outros dois vão junto:
+git add .aidev/{slug}/SPEC.md .aidev/{slug}/PLAN.md
 git commit -m "<tipo>(<slug>): <título> [T{NN}]"
 ```
 

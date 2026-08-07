@@ -214,7 +214,9 @@ Tipo vem do campo `**Nível:**` (tabela na seção 5 de `heuristicas-execucao.md
 sem casamento, `chore` explícito e um aviso — chute silencioso polui o histórico.
 
 Entram no commit: a interseção entre "Arquivos Afetados" do PLAN e o que foi
-efetivamente modificado, **mais** o `TASKS.md` do bundle e o arquivo de memória.
+efetivamente modificado, **mais tudo que o próprio fluxo escreveu** — o
+`TASKS.md`, o arquivo de memória, e o `SPEC.md`/`PLAN.md` quando houve transição
+de status nesta invocação.
 Nunca `git add -A`. Nunca `--no-verify` ou `--no-gpg-sign` — hook que falha é
 sinal real.
 
