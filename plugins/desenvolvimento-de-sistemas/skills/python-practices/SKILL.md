@@ -1,6 +1,6 @@
 ---
 name: python-practices
-description: "Boas práticas, padrões de qualidade e planejamento de desenvolvimento em Python. Use esta skill sempre que: (1) estiver escrevendo, revisando ou analisando código Python — inclui convenções PEP 8, type hints, orientação a objetos, error handling, organização de módulos e async; (2) precisar planejar ou decompor uma funcionalidade Python em tarefas — inclui definir escopo, criar checklists, identificar dependências técnicas e estruturar critérios de aceitação. Ativar mesmo quando o usuário não pedir explicitamente por 'boas práticas' ou 'planejamento', bastando que a tarefa envolva escrever arquivos .py ou implementar algo em Python."
+description: "Padrões de código Python deste ecossistema — as decisões já tomadas sobre type hints, exceções e tratamento de erro, orientação a objetos e injeção de dependências, separação de camadas, PEP 8, async e anti-patterns. Consulte ANTES de escrever ou alterar qualquer arquivo .py — implementar endpoint ou rota, service, repository, model, schema, classe ou módulo, refatorar, corrigir bug, escrever ou ajustar teste. Não assuma que o código vizinho já segue estes padrões; imitar os arquivos ao redor costuma propagar justamente o que a skill corrige, e revisar depois de escrito vira retrabalho. Inclui checklist de implementação por tipo de tarefa (novo endpoint/handler, nova classe, integração externa, refatoração) e como decompor uma funcionalidade Python em tarefas. Use também para revisar ou auditar código Python existente."
 ---
 
 # Python Practices
