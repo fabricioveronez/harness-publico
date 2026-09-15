@@ -34,8 +34,14 @@ recursivo. Skills reais são só `plugins/<plugin>/skills/<skill>/SKILL.md` (SKI
 pasta da skill); qualquer coisa mais funda — `.venv`, `skill-snapshot/`, `outputs/docs/` de
 evals — é lixo e fica de fora. Docs reais são só `plugins/<plugin>/docs/<skill>.md`.
 
+## Deploy
+
+Publicado em GitHub Pages (`https://fabricioveronez.github.io/harness-publico/`) via
+`.github/workflows/deploy-pages.yml`, que builda `site/` a cada push em `main`. O `base`
+em `astro.config.mjs` (`/harness-publico/`) reflete o path de projeto do Pages — todo link
+interno usa `import.meta.env.BASE_URL` em vez de path absoluto.
+
 ## Fora de escopo (por ora)
 
-- Deploy (repo privado; teste local primeiro).
 - Extração do template genérico.
 - Docs órfãos (doc sem skill de mesmo nome) como páginas de overview.

@@ -22,7 +22,7 @@ const { plugin, skills } = Astro.props;
 ---
 <Base title={plugin.data.name} description={plugin.data.description}>
   <nav class="mb-4 text-sm text-zinc-500">
-    <a href="/" class="hover:text-brand-600 dark:hover:text-brand-300">Skills</a>
+    <a href={import.meta.env.BASE_URL} class="hover:text-brand-600 dark:hover:text-brand-300">Skills</a>
     <span class="mx-1">/</span>
     <span>plugins</span>
   </nav>

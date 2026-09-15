@@ -17,7 +17,7 @@ const pending = skills.filter((s) => !s.data.hasDoc).length;
 <Base>
   <section class="mb-6">
     <div class="flex items-center gap-3">
-      <img src={site.logo} alt="" class="h-10 w-10 shrink-0 rounded-lg" />
+      <img src={`${import.meta.env.BASE_URL}${site.logo.replace(/^\//, '')}`} alt="" class="h-10 w-10 shrink-0 rounded-lg" />
       <h1 class="text-2xl font-bold tracking-tight sm:text-3xl">{site.name}</h1>
     </div>
     <p class="mt-1 text-zinc-600 dark:text-zinc-400">{site.tagline}</p>

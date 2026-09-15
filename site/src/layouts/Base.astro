@@ -29,8 +29,8 @@ const fullTitle = title ? `${title} · ${site.name}` : `${site.name} — ${site.
   <body class="min-h-screen bg-white text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
     <header class="sticky top-0 z-20 border-b border-zinc-200/70 bg-white/80 backdrop-blur dark:border-zinc-800/70 dark:bg-zinc-950/80">
       <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <a href="/" class="flex items-center gap-2 font-semibold tracking-tight">
-          <img src={site.logo} alt={site.name} class="h-7 w-7 rounded-md" />
+        <a href={import.meta.env.BASE_URL} class="flex items-center gap-2 font-semibold tracking-tight">
+          <img src={`${import.meta.env.BASE_URL}${site.logo.replace(/^\//, '')}`} alt={site.name} class="h-7 w-7 rounded-md" />
           {site.name}
         </a>
         <button

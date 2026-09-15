@@ -4,6 +4,8 @@ Marketplace **público** de plugins personalizados para o Claude Code, seguindo 
 
 > Parte do conjunto `harness-repos/` (Pessoal · Público · Empresarial). Veja também `harness-pessoal` e `harness-empresarial`.
 
+**Catálogo publicado:** https://fabricioveronez.github.io/harness-publico/
+
 ## Como instalar
 
 Via [`npx skills`](https://github.com/vercel-labs/skills) (skills aninhadas em `plugins/*/skills/*` → `--full-depth`):
@@ -38,7 +40,9 @@ harness-publico/
 └── site/               # vitrine local (Astro) — projeção pura do repositório
 ```
 
-## Vitrine local (site)
+## Vitrine (site)
+
+Publicada via GitHub Pages a cada push em `main` (workflow `.github/workflows/deploy-pages.yml`).
 
 ```bash
 cd site

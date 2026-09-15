@@ -4,7 +4,8 @@ import tailwindcss from '@tailwindcss/vite';
 
 // Site vitrine da harness-library. Lê os plugins/skills do repo pai (../) no build.
 export default defineConfig({
-  site: 'http://localhost:4321',
+  site: 'https://fabricioveronez.github.io',
+  base: '/harness-publico/',
   vite: {
     plugins: [tailwindcss()],
   },
