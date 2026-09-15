@@ -10,7 +10,7 @@ description: >
   revisar, analisar ou validar um documento técnico — mesmo que não use o termo "revisão".
   Também quando mencionar "verificar PRD", "analisar spec", "revisar o plano", "validar
   as tasks", "revisar TRD", "tem alguma coisa faltando", "está pronto para implementar?",
-  "revisar antes de codar", "validar documento", "checar inconsistências", ".aidev",
+  "revisar antes de codar", "validar documento", "checar inconsistências", ".sdd",
   ou qualquer variação que indique avaliação de qualidade de um documento técnico
   antes de iniciar a implementação.
 ---
@@ -68,7 +68,8 @@ problemas reais — e é o que alimenta a resolução por inferência mais adian
 - Leia os documentos referenciados pelo documento revisado (frontmatter `depends_on`,
   `references`, links no corpo)
 - Busque outros documentos no projeto que mencionem o mesmo componente ou feature
-  (usar Grep/Glob em `docs/`, `.aidev/` e similares)
+  (usar Grep/Glob em `docs/` e similares; `.sdd/` é pasta oculta que a busca costuma pular —
+  leia os bundles por caminho explícito ou pela saída de `sdd estado`)
 - Para cada dependência, identifique: o que esse documento espera receber? O que
   o outro documento promete entregar? As interfaces batem?
 
@@ -113,8 +114,8 @@ ser respondidas; a forma da resposta é livre:
    delegadas a ela; se não existe, o revisor edita diretamente (ver Pós-revisão).
 4. **Quais modos de falha importam para este documento?** Selecionar do repertório
    abaixo o que se aplica e adicionar dimensões específicas que o repertório não prevê
-   (ex: para um TASKS.md, a integridade do grafo de `needs:` — dependências circulares
-   ou apontando para tasks inexistentes).
+   (ex: para um SPEC.md do fluxo sdd, a integridade do grafo `depende_de` entre fatias —
+   dependências circulares ou apontando para fatias inexistentes; `sdd grafo validar` confere).
 
 Exemplos ilustrativos de respostas que costumam emergir — **não prescrever**, o
 esqueleto é consequência do documento, não forma que o documento preenche:
@@ -122,8 +123,8 @@ esqueleto é consequência do documento, não forma que o documento preenche:
 | Tipo | Upstream típico | Invariantes típicos | Dono típico da edição |
 |---|---|---|---|
 | PRD | intenção do usuário, TRD | Registro de Decisões | `escrever-prd` |
-| SPEC.md (bundle `.aidev/`) | PRD (quando existe), senão intenção do usuário | IDs de US, critérios de aceite §5a | `preparar-execucao` |
-| PLAN/TASKS | SPEC (e PRD quando existe) | IDs de task, marcações `[X]` | `preparar-execucao` (reconciliação) |
+| SPEC.md (`.sdd/`) | origem declarada (PRD, issue), senão intenção do usuário | IDs de US, critérios de aceite | `sdd-especificar` |
+| PLAN/TASKS | SPEC (e a origem quando existe) | IDs de task, marcações `[X]` | `sdd-especificar` (reconciliação) |
 | TRD | código/stack real | — | `escrever-trd` |
 | spec/RFC avulsa | sistema que descreve | — | revisor edita direto |
 
@@ -258,11 +259,11 @@ evidenciada.
 Após o usuário aprovar o lote (ou vetar itens) e confirmar os itens da zona do usuário,
 aplique as correções **respeitando o dono de cada artefato** (identificado no Passo 3):
 
-- **Existe skill dona** (`escrever-prd`, `preparar-execucao`, `escrever-trd`): corrigir via
+- **Existe skill dona** (`escrever-prd`, `sdd-especificar`, `escrever-trd`): corrigir via
   ela. Em cadeias derivadas (PRD → SPEC → PLAN/TASKS), corrigir o upstream e propagar pela
   reconciliação da skill dona — ela já protege os invariantes (IDs, `[X]`). Não
   reimplementar essas regras aqui.
-- **Problema exclusivo do artefato derivado** (ex: `needs:` quebrado no TASKS.md, que
+- **Problema exclusivo do artefato derivado** (ex: `depende_de` quebrado num SPEC.md, que
   não decorre do PRD): editar diretamente, preservando os invariantes do esqueleto.
 - **Sem dono** (spec avulsa, RFC): editar diretamente.
 

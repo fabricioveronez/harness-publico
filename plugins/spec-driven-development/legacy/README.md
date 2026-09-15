@@ -1,4 +1,24 @@
-# Skills legadas — fluxo de execução em quatro skills
+# Skills legadas
+
+## `fv-spec-driven` → fluxo `sdd` (2026-09)
+
+A `fv-spec-driven` também virou legado. Ela foi substituída pelo fluxo **sdd**: quatro skills de
+fase sobre a CLI agnóstica `sdd`, desenvolvidas em `~/projetos/meu-novo-sdd/novo-sdd`
+(`plugins/sdd/`). O motivo: numa skill só, cada worker paralelo carregava o ciclo inteiro, a
+memória misturava estado com conhecimento, e a própria skill empurrava para o paralelo.
+
+| Modo da `fv-spec-driven` | Vira, no fluxo sdd |
+|---|---|
+| Preparar | `sdd-especificar` (sem manifesto: grafo no frontmatter do SPEC) |
+| Implementar | `sdd-implementar` |
+| Validar | `sdd-validar` (por fatia, com revisores independentes) + `sdd-arquivar` (por feature) |
+| Orquestrar | futuro `sdd-orquestrar`, invocado só pelo usuário |
+| `scripts/*.py` | CLI `sdd` (TypeScript): `estado`, `grafo`, `cobertura`, `transicao`, `commit`, `fechar`, `licoes` |
+
+Não há migração de `.aidev/`: bundles em andamento terminam com a `fv-spec-driven` a partir daqui
+(`legacy/fv-spec-driven/`) ou são reespecificados em `.sdd/`.
+
+## As quatro skills anteriores
 
 Estas quatro skills foram **substituídas** pela skill `fv-spec-driven`, que funde
 as quatro num ciclo de quatro modos sobre o mesmo bundle.

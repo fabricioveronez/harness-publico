@@ -9,7 +9,8 @@ Uma decisão merece ADR quando é **durável, de blast radius amplo e cara de re
 | Característica | ADR? |
 |---|---|
 | Sobrevive à feature, afeta outras features ou o sistema, custosa de reverter | ✅ ADR (`docs/adrs/`) |
-| Local à feature, efêmera, morre com o plano | ❌ PLAN "Abordagem Técnica" (`.aidev/`) |
+| Local à feature e difícil de reverter | ❌ PLAN da fatia (`.sdd/`, via `sdd-especificar`) |
+| Local à feature e reversível | ❌ nenhum registro — decide-se construindo |
 
 Exemplos de ADR: escolha de banco, estratégia de autenticação, padrão arquitetural (hexagonal, event-driven), biblioteca estruturante, convenção de API.
 

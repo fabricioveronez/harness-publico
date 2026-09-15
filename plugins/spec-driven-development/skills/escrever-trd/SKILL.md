@@ -5,10 +5,10 @@ description: >
   requisitos não-funcionais, dependências externas, padrões e decisões globais do projeto.
   Também cria ADRs (Architecture Decision Records) no Modo Decision: registra uma decisão
   técnica em `docs/adrs/` e atualiza a seção Decisões Globais. O TRD é o contexto técnico
-  carregado automaticamente por `preparar-execucao` e `implementar-task`.
+  consultado pelas skills do fluxo sdd (`sdd-especificar` em diante).
 
   Use ao criar um TRD, documentar a stack, registrar padrões de arquitetura, começar projeto
-  novo sem TRD, quando a stack mudou, ou quando `preparar-execucao` pedir contexto técnico por falta
+  novo sem TRD, quando a stack mudou, ou quando o `sdd-especificar` pedir contexto técnico por falta
   de `docs/trd.md` — mesmo sem usar o termo "TRD". Use o Modo Decision quando o usuário quiser
   "registrar uma decisão", "criar um ADR", ou disser "decidimos usar/trocar X por Y" — é
   decisão técnica/arquitetural, distinta de decisão de produto (que fica no PRD).
@@ -17,8 +17,7 @@ description: >
 # Escrever TRD
 
 Cria e mantém o TRD (Technical Requirements Document) em `docs/trd.md`. O TRD é o documento
-técnico global do projeto: único, mantido, carregado automaticamente por `preparar-execucao` e
-`implementar-task`. Cobre o que é global e estável — stack, arquitetura, requisitos
+técnico global do projeto: único, mantido, consultado pelas skills do fluxo sdd. Cobre o que é global e estável — stack, arquitetura, requisitos
 não-funcionais, dependências externas, padrões e decisões. Requisitos de uma feature
 específica ficam no PRD; detalhes de uma decisão pontual ficam em ADRs.
 
@@ -56,6 +55,15 @@ decisão / criar ADR) e sobrepõe a detecção automática.
 Roda quando `docs/trd.md` não existe. O objetivo é gerar um TRD completo com o mínimo
 de fricção: a maior parte do conteúdo deve vir da análise automática e do enriquecimento;
 a entrevista cobre apenas as lacunas reais.
+
+#### Passo 0 — Projeto sem código (a partir de documento de origem)
+
+Quando o projeto ainda não tem código — tipicamente logo depois de um brainstorm de sistema
+(`brainstorm-for-systems`) — não há arquivo para analisar. A fonte é o **documento de origem**
+(a consolidação do brainstorm ou outro documento que o usuário indicar): extraia dele Stack,
+Arquitetura, Requisitos Não-Funcionais e Dependências Externas, pule o Passo 1, aplique o
+enriquecimento externo (Passo 2) às dependências citadas e entreviste só as lacunas. Itens que o
+documento marca como Verificados entram com a fonte e a data da consulta.
 
 #### Passo 1 — Análise automática do projeto
 
@@ -258,9 +266,10 @@ Roda quando o usuário pede para registrar uma decisão técnica ("registra a de
 
 Registrar como ADR só decisão **durável, de blast radius amplo e cara de reverter** — escolha
 de banco, estratégia de auth, padrão arquitetural, biblioteca estruturante, convenção de API.
-Decisão **local a uma feature e efêmera** (qual util reusar, como fiar um endpoint) não é ADR:
-mora no PLAN "Abordagem Técnica" do `preparar-execucao`. Se o pedido for de decisão local, avisar e
-sugerir o PLAN em vez de criar ADR.
+Decisão **local a uma feature** não é ADR: se for difícil de reverter (nova dependência, modelo de
+dados, interface entre fatias), mora no PLAN da fatia, gerado pelo `sdd-especificar`; se for
+reversível (qual util reusar, como fiar um endpoint), nem precisa de registro. Se o pedido for de
+decisão local, avisar e sugerir o caminho certo em vez de criar ADR.
 
 #### Passo 1 — Numeração
 
@@ -308,7 +317,7 @@ disciplina da imutabilidade do PRD `concluido`.
 Esta skill **não**:
 
 - Cria PRDs (papel de `escrever-prd`)
-- Gera PLAN+TASKS (papel de `preparar-execucao`)
+- Gera SPEC, PLAN ou TASKS (papel do `sdd-especificar`)
 - Cria ADRs fora do Modo Decision — nos modos Criação e Edição apenas referencia os ADRs já existentes em `docs/adrs/`; a criação de ADR é exclusiva do Modo Decision
 - Toma decisões de negócio — lacunas são devolvidas ao usuário
 - Edita `docs/trd.md` se o usuário cancelar o preview antes de gravar

@@ -1,6 +1,6 @@
 # Template PRD
 
-Estrutura padrão do PRD de feature gerado pela skill. O PRD é o **documento de negócio** da feature — cobre comportamento e regra de negócio. Detalhe técnico (stack, arquitetura, NFR global, realização) **não** mora aqui: vive no TRD (`docs/trd.md`), nos ADRs (`docs/adrs/`) e no PLAN (`./.aidev/`). Aplicável a qualquer tipo de projeto de software.
+Estrutura padrão do PRD de feature gerado pela skill. O PRD é o **documento de negócio** da feature — cobre comportamento e regra de negócio. Detalhe técnico (stack, arquitetura, NFR global, realização) **não** mora aqui: vive no TRD (`docs/trd.md`), nos ADRs (`docs/adrs/`) e no PLAN da fatia (`.sdd/`). Aplicável a qualquer tipo de projeto de software.
 
 ## Fronteira: o que é negócio e o que não é
 
@@ -194,7 +194,7 @@ forçada, é tarefa disfarçada ou dois marcos espremidos) e por um **checklist 
 (critérios de §5a filtrados pelas USs, marcáveis pelo Aprovador). **Sem número mínimo**; o teto
 de ~6 é sinal de que talvez sejam várias features (ver §2a). A decomposição em tarefas técnicas
 (passos, validação, ordem de execução) e o dimensionamento do artefato de execução são do
-PLAN/TASKS, gerados por `preparar-execucao` — não detalhar nem dirigir isso aqui.]
+SPEC/TASKS, gerados pelo `sdd-especificar` — não detalhar nem dirigir isso aqui.]
 
 ## 7. Riscos e Dependências
 
