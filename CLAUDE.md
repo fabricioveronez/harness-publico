@@ -8,8 +8,8 @@ Marketplace **público** de plugins para o Claude Code, seguindo o padrão ofici
 
 Faz parte do conjunto `~/projetos/harness-repos/`:
 
-- `harness-pessoal` — skills pessoais (gestao-pessoal, spec-driven-ops, uso-geral) — **privado**
-- `harness-publico` — **este repo**: skills técnicas compartilháveis (spec-driven-development, desenvolvimento-de-sistemas, devops)
+- `harness-pessoal` — skills pessoais (gestao-pessoal, uso-geral, spec-driven-ops, estudos, devops, desenvolvimento-de-sistemas, spec-driven-development-legado) — **privado**
+- `harness-publico` — **este repo**: skills técnicas compartilháveis (spec-driven-development, uso-geral)
 - `harness-empresarial` — IP de conteúdo (producao-de-conteudo, edicao-de-video, educacao-e-cursos) — **privado**
 
 ## Estrutura
@@ -26,9 +26,8 @@ harness-publico/
 
 ## Plugins (Domínios)
 
-- `spec-driven-development` — fluxo spec-driven para software: PRD, TRD, revisão, plano/tasks e implementação
-- `desenvolvimento-de-sistemas` — boas práticas (Python/TypeScript), bootstrap Next.js e testes (unit/E2E)
-- `devops` — Docker, Kubernetes, Terraform, GitHub Actions, runbooks
+- `spec-driven-development` — fluxo spec-driven para software: escrever PRD e TRD
+- `uso-geral` — brainstorm e maturação de ideias antes de especificar ou implementar
 
 ## Formato de uma Skill
 

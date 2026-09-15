@@ -13,19 +13,18 @@ Via [`npx skills`](https://github.com/vercel-labs/skills) (skills aninhadas em `
 npx skills add fabricioveronez/harness-publico --full-depth
 
 # Instalar as skills de um plugin
-npx skills add fabricioveronez/harness-publico/plugins/devops/skills
+npx skills add fabricioveronez/harness-publico/plugins/spec-driven-development/skills
 
 # Instalar uma skill específica
-npx skills add fabricioveronez/harness-publico@docker-practices --full-depth
+npx skills add fabricioveronez/harness-publico@brainstorm --full-depth
 ```
 
 ## Plugins
 
 | Plugin | Descrição |
 |--------|-----------|
-| `spec-driven-development`     | Fluxo spec-driven para software: PRD, TRD, revisão, plano/tasks e implementação |
-| `desenvolvimento-de-sistemas` | Boas práticas (Python/TypeScript), bootstrap Next.js e testes (unit/E2E) |
-| `devops`                      | Docker, Kubernetes, Terraform, GitHub Actions, runbooks |
+| `spec-driven-development` | Fluxo spec-driven para software: escrever PRD e TRD |
+| `uso-geral`                | Brainstorm e maturação de ideias antes de especificar ou implementar |
 
 ## Estrutura
 

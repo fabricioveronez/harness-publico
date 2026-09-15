@@ -10,7 +10,7 @@ export const site = {
   // Logo servida de site/public/ (URL na raiz). Troque o arquivo para reskin — sem mudar código.
   logo: '/logo.svg',
   description:
-    'Vitrine navegável dos plugins e skills técnicos compartilháveis (desenvolvimento de sistemas, devops) — derivada direto dos arquivos do repositório.',
+    'Vitrine navegável dos plugins e skills técnicos compartilháveis (spec-driven development, uso geral) — derivada direto dos arquivos do repositório.',
   repo: {
     slug: repoSlug,
     // Instala todas as skills do repo (aninhadas em plugins/*/skills/*) — precisa de --full-depth.

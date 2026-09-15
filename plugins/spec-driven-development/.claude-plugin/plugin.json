@@ -1,7 +1,7 @@
 {
   "name": "spec-driven-development",
-  "version": "2.0.0",
-  "description": "Fluxo spec-driven para software: PRD, TRD, revisão e o ciclo de execução (fatias, paralelismo, implementação e validação)",
+  "version": "3.0.0",
+  "description": "Fluxo spec-driven para software: escrever PRD e TRD",
   "author": {
     "name": "Fabricio Veronez",
     "email": "fabricio@veronez.io"
