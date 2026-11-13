@@ -26,7 +26,7 @@ harness-publico/
 
 ## Plugins (Domínios)
 
-- `spec-driven-development` — fluxo spec-driven para software: escrever Epic, PRD e TRD
+- `spec-driven-development` — fluxo spec-driven para software: brainstorm de sistemas e escrever Epic, PRD e TRD
 - `uso-geral` — brainstorm e maturação de ideias antes de especificar ou implementar
 - `devops` — boas práticas para Docker e Kubernetes
 

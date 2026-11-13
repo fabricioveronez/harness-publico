@@ -1,7 +1,7 @@
 {
   "name": "spec-driven-development",
-  "version": "4.0.0",
-  "description": "Fluxo spec-driven para software: escrever Epic, PRD e TRD",
+  "version": "4.1.0",
+  "description": "Fluxo spec-driven para software: brainstorm de sistemas e escrever Epic, PRD e TRD",
   "author": {
     "name": "Fabricio Veronez",
     "email": "fabricio@veronez.io"
