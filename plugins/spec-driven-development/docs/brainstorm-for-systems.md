@@ -13,7 +13,7 @@ Acionada só pelo usuário (`/brainstorm-for-systems`), quando o assunto é um s
 | `brainstorm` | conduz a conversa (lente de especificação forçada) |
 | `escrever-trd` | Modo Decision para ADR; Criação/Edição para o TRD no portão |
 
-As duas são obrigatórias: faltando qualquer uma, a skill avisa e para. Não vêm no pacote do `sdd`; o `sdd init` avisa quando não as encontra.
+As duas são obrigatórias: faltando qualquer uma, a skill avisa e para.
 | `docs/glossary.md` | vocabulário do domínio, com sinônimos a evitar |
 
-Detalhes: `skills/brainstorm-for-systems/references/` (critério de ADR, portão da Fase 4). Guia geral do fluxo: `docs/uso.md`.
+Detalhes: `skills/brainstorm-for-systems/references/` (critério de ADR, portão da Fase 4).

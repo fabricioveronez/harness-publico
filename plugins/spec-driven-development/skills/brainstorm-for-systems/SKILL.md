@@ -19,8 +19,7 @@ escrito antes de se saber onde a aplicação roda vira retrabalho. Por isso as d
 2. Invoque a skill `escrever-trd` no portão: Modo Decision para cada ADR confirmado, Modo
    Criação/Edição para o TRD.
 
-As duas são dependências obrigatórias e não vêm no pacote do `sdd` (o `sdd init` avisa quando
-faltam). Antes de começar, confira que `brainstorm` e `escrever-trd` estão disponíveis; se qualquer
+As duas são dependências obrigatórias. Antes de começar, confira que `brainstorm` e `escrever-trd` estão disponíveis; se qualquer
 uma faltar, diga qual e como instalá-la e pare — sem elas a composição não registra ADR nem TRD, e
 um substituto improvisado geraria documentos fora do formato que o resto do fluxo lê.
 
@@ -70,7 +69,7 @@ Quando um termo do domínio se resolve — o usuário escolhe um nome entre sin�
 conceito que é deste projeto — atualize `docs/glossary.md` naquele momento, sem acumular para
 depois. Crie o arquivo só quando o primeiro termo aparecer.
 
-Formato: `sdd template glossary` quando a CLI `sdd` estiver instalada; sem ela, este mínimo:
+Formato:
 
 ```markdown
 **Termo**:
@@ -95,7 +94,7 @@ Leia `references/portao-fase4.md` ao chegar na consolidação.
 ## Saída: documento e próxima fase
 
 Ao fim do portão, ofereça salvar o documento do brainstorm (`docs/brainstorm-{slug}.md`, Fase 5 do
-`brainstorm`) e sugira o `sdd-especificar` numa **sessão nova**, com esse documento como origem. O
+`brainstorm`) e sugira o `escrever-prd` numa **sessão nova**, com esse documento como origem. O
 documento aponta para os ADRs e o TRD por link em vez de repetir o conteúdo deles — ele guarda o
 raciocínio; os ADRs e o TRD guardam a decisão. Com ele, a especificação começa sem arrastar a
-conversa inteira como contexto e o `sdd-validar` tem de onde tirar o porquê das regras.
+conversa inteira como contexto e preserva o porquê das regras.

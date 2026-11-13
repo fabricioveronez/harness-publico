@@ -29,7 +29,7 @@ Faltou uma, não é ADR.
 | Caso | Destino |
 |---|---|
 | Fato de stack sem alternativa discutida | seção Stack do TRD, no portão |
-| Decisão local a uma feature | PLAN da fatia, mais tarde, pelo `sdd-especificar` |
+| Decisão local a uma feature | especificação da feature, mais tarde |
 | Preferência reversível sem custo | lugar nenhum — decide-se construindo |
 | Decisão ainda Inferida | espera a confirmação do usuário |
 | Decisão Em aberto | ADR `proposto` gravado no portão, com a pendência que o destrava |

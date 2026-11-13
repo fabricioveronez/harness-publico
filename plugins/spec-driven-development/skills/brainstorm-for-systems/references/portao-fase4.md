@@ -48,6 +48,5 @@ Item Verificado entra com a fonte e a data da consulta.
 
 Sugira, sem executar:
 - salvar o documento do brainstorm (`docs/brainstorm-{slug}.md`), se ainda não existe;
-- `escrever-prd` para os requisitos de negócio levantados na lente (opcional);
-- `sdd-especificar` numa sessão nova, com o documento do brainstorm ou o PRD como origem, para
-  transformar a primeira capacidade em spec executável.
+- `escrever-prd` numa sessão nova, com o documento do brainstorm como origem, para formalizar os
+  requisitos de negócio levantados na lente.
