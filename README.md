@@ -27,6 +27,7 @@ npx skills add fabricioveronez/harness-publico@brainstorm --full-depth
 |--------|-----------|
 | `spec-driven-development` | Fluxo spec-driven para software: escrever Epic, PRD e TRD |
 | `uso-geral`                | Brainstorm e maturação de ideias antes de especificar ou implementar |
+| `devops`                   | Boas práticas para Docker e Kubernetes |
 
 ## Estrutura
 

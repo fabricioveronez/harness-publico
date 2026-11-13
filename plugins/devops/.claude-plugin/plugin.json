@@ -1,0 +1,9 @@
+{
+  "name": "devops",
+  "version": "1.0.0",
+  "description": "Boas práticas para Docker e Kubernetes",
+  "author": {
+    "name": "Fabricio Veronez",
+    "email": "fabricio@veronez.io"
+  }
+}
