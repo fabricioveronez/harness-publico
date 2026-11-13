@@ -56,8 +56,9 @@ fonte** (`[WebSearch]`, `[context7]`…), validada pelo usuário no preview — 
 - **preparar-execucao** — consome `docs/trd.md` como contexto técnico global; sem ele, entra em
   mini-modo de coleta (entrevista curta sobre stack, convenções e comando de teste).
 - **implementar-task** — consome `docs/trd.md` quando referenciado pelo `PLAN.md`.
-- **escrever-prd** — documenta a feature, não o projeto. Quando um input de PRD traz uma decisão
-  arquitetural durável, ela é roteada para o **Modo Decision** desta skill.
+- **escrever-prd** — documenta direção de produto em Epics e comportamento de feature em PRDs;
+  não documenta a realização técnica do projeto. Quando o input traz uma decisão arquitetural
+  durável, ela é roteada para o **Modo Decision** desta skill.
 - **revisao-documento-tecnico** — revisa o TRD; esta skill é o "dono da edição" para onde as
   correções voltam.
 - **orquestrar-execucao** — indireta: cada `implementar-task` disparado em paralelo carrega o

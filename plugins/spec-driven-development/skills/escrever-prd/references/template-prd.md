@@ -1,229 +1,139 @@
 # Template PRD
 
-Estrutura padrão do PRD de feature gerado pela skill. O PRD é o **documento de negócio** da feature — cobre comportamento e regra de negócio. Detalhe técnico (stack, arquitetura, NFR global, realização) **não** mora aqui: vive no TRD (`docs/trd.md`), nos ADRs (`docs/adrs/`) e no PLAN da fatia (`.sdd/`). Aplicável a qualquer tipo de projeto de software.
+Estrutura padrão do PRD de feature. O documento cobre comportamento, regra de negócio e
+razão específica da feature. Realização técnica e constraints globais vivem no TRD, ADRs e
+PLAN/TASKS.
 
-## Fronteira: o que é negócio e o que não é
-
-A régua para decidir se algo entra no PRD tem dois eixos:
-
-1. **Escopo** — específico desta feature (candidato a PRD) vs. global/transversal (TRD).
-2. **Natureza** — o *requisito/intenção* (o quê, com que limiar, por qual razão de negócio) vs. a *realização técnica* (como construir ou sustentar).
-
-> **PRD = requisito + razão, no escopo da feature. TRD/ADR/PLAN = realização técnica + constraint global.**
-
-Aplicando:
+## Fronteira
 
 | Conteúdo | Onde mora |
 |---|---|
-| Comportamento, regra de negócio, edge case | PRD |
-| "Como de produto" (forma da solução em termos de comportamento) | PRD |
-| Limiar de feature com razão de negócio (ex.: "resposta < 2s, senão duplica cobrança") | PRD (§5a) |
-| Métrica de sucesso (baseline → meta) | PRD (§5b) |
-| "Como técnico" (JWT, Redis, event-driven, modelo de dados) | PLAN |
-| Decisão arquitetural durável (imutável) | ADR (`docs/adrs/`) |
-| NFR global (p95 geral, uptime, criptografia) | TRD |
-| Decomposição em tarefas | PLAN/TASKS |
-| Dimensionamento/rastreio do artefato técnico (bundle, fatia, verticalização) | PLAN/TASKS — o PRD referencia, mas não dirige |
+| Comportamento, regra, edge case e forma de produto | PRD |
+| Limiar específico com razão de negócio | PRD (§5a) |
+| Métrica de sucesso da feature | PRD (§5b) |
+| Stack, modelo de dados e mecanismo técnico | PLAN/TRD |
+| Decisão arquitetural durável | ADR |
+| NFR global | TRD |
+| Decomposição e ordem de implementação | PLAN/TASKS |
 
-## Semântica dos campos de controle
+## Controle
 
-**`status`** — ciclo de vida da feature:
-
-- `rascunho` — em criação ou revisão, ainda não aprovado
-- `pronto` — aprovado, aguardando planejamento/execução
-- `em-progresso` — execução ativa (transição feita pela skill de planejamento/execução)
-- `concluido` — feature entregue; **o PRD congela e vira registro histórico imutável**. Alcançado quando **todos os milestones têm o checklist de aceite aprovado**. A transição em si é feita por quem aprova/executa, **não por esta skill** (que não faz transição de estado)
-
-Quando um PRD chega em `concluido`, ele não é mais editado. Mudanças de comportamento posteriores abrem um novo PRD que pode referenciar o original via `depends_on`.
-
-**`depends_on`** — grafo de rastreabilidade entre PRDs:
-
-- Lista os `prd_number` das features das quais esta depende diretamente
-- Carregamento é sob demanda (progressive disclosure) — o agente só lê um PRD dependente quando o contexto da implementação exigir aquele conhecimento específico
-- Deve ser mapeado durante a criação do PRD e reavaliado sempre que o escopo mudar em revisão
-- Só listar dependências reais — não incluir PRDs apenas "relacionados" ou "do mesmo domínio"
-
----
+- `rascunho` — em criação ou revisão.
+- `pronto` — aprovado para planejamento.
+- `em-progresso` — execução ativa.
+- `concluido` — todos os critérios `ACxx` aprovados; documento imutável.
+- `depends_on` lista apenas PRDs dos quais esta feature depende diretamente.
+- `origin_epic` e `origin_capability` são proveniência opcional, nunca dependência.
 
 ```markdown
 ---
+artifact_type: prd
 prd_number: "NNN"
 status: rascunho | pronto | em-progresso | concluido
 priority: baixa | média | alta | crítica
 created: YYYY-MM-DD
 issue: "#número (opcional)"
-depends_on: [] # lista de PRDs dos quais esta feature depende
-references: [] # links para docs, issues, ADRs, PRDs relacionados, recursos externos
+depends_on: []
+references: []
+# Incluir os dois campos seguintes somente quando a origem for explícita:
+# origin_epic: "E001"
+# origin_capability: "C01"
 ---
 
 # PRD NNN: [Título descritivo da feature]
 
 ## 1. Contexto
 
-[Descrição de negócio que situa a feature. O foco é o problema e o estado atual
-do ponto de vista do produto/usuário — não o detalhe de stack. Incluir:]
+- **Produto/área:** [onde a feature se insere]
+- **Estado atual:** [o que é possível hoje]
+- **Problema:** [dor, público afetado e impacto]
 
-- **Produto/área**: [em qual produto ou área de negócio esta feature se insere]
-- **Estado atual**: [o que o usuário consegue ou não fazer hoje, como o fluxo funciona hoje]
-- **Problema**: [qual dor esta feature resolve, quem é afetado, qual o impacto de não resolver]
+[Contexto técnico fica no TRD; aqui cabe apenas referência quando relevante.]
 
-> **Contexto técnico** (stack, arquitetura, padrões) vive no TRD (`docs/trd.md`),
-> carregado automaticamente na implementação. Aqui basta um ponteiro quando relevante —
-> não duplicar stack no PRD.
-
-## 2. Solução Proposta
+## 2. Solução proposta
 
 ### Visão de produto
 
-[3-5 bullets descrevendo a abordagem em termos de **comportamento e valor** —
-o "como de produto", não a arquitetura. Ex.: "resolver abandono de checkout com
-pagamento 1-clique e cartão salvo", não "via PaymentIntents + lock no Redis".]
+- [comportamento e valor, não mecanismo técnico]
 
 ### Decisões de produto
 
-1. [Decisão de produto com justificativa curta — ex.: "convite expira em 7 dias"]
-2. [Decisão de produto com justificativa curta]
-
-> Decisão **arquitetural** (durável, técnica) não entra aqui — registre como ADR
-> (`docs/adrs/`) via `escrever-trd` Modo Decision e referencie em §8 se relevante.
+1. [decisão com justificativa]
 
 ### Fora do escopo
 
-- [O que NÃO será feito e por quê]
-- [O que NÃO será feito e por quê]
+- [exclusão e motivo]
 
 ## 3. Funcionalidades
 
-### US01: [Título objetivo]
+### US01: [Título]
 
 Como [persona], quero [ação], para [benefício].
 
 **Rules:**
-- [Regra de negócio ou comportamento esperado]
-- [Limite, restrição ou condição]
+- [regra de negócio ou comportamento]
 
 **Edge cases:**
-- [Situação anômala] → [comportamento esperado]
-- [Situação anômala] → [comportamento esperado]
+- [situação anômala] → [comportamento esperado]
 
-### US02: [Título objetivo]
+[Repetir para cada funcionalidade. IDs são estáveis; detalhe técnico pertence ao PLAN.]
 
-Como [persona], quero [ação], para [benefício].
+## 4. Fluxo de negócio
 
-**Rules:**
-- [Regra de negócio ou comportamento esperado]
+[Diagrama de jornada ou processo somente quando decisões e ramificações de negócio não
+ficarem claras no texto. Omitir a seção quando não for necessária.]
 
-**Edge cases:**
-- [Situação anômala] → [comportamento esperado]
-
-[Repetir para cada funcionalidade identificada. Cada US deve ter pelo menos uma
-Rule e um Edge case. Detalhe técnico de implementação não entra na US — vai no PLAN.]
-
-## 4. Fluxo de Negócio
-
-[Diagrama de **jornada ou processo de negócio** — os pontos de decisão são regras
-de negócio, não componentes de software. Útil quando a feature tem ramificação de
-regra que o texto dos Edge cases não deixa clara.]
-
-```
-Reembolso solicitado
+```text
+Solicitação
    │
    ▼
-Pedido tem < 7 dias?
-   ├── sim ──▶ Reembolso automático ──▶ Notifica usuário
-   └── não ──▶ Fila de aprovação manual ──▶ Aprovado? ──┬── sim ──▶ Reembolso
-                                                        └── não ──▶ Nega + justifica
+Regra satisfeita?
+   ├── sim ──▶ Resultado esperado
+   └── não ──▶ Tratamento de negócio
 ```
 
-[Seção opcional. Topologia técnica (componentes/serviços, modelo de dados) **não**
-entra aqui — fica no "Diagrama de Implementação" do PLAN.]
+## 5. Critérios de aceite
 
-## 5. Critérios de Aceite
+### 5a. Critérios da feature
 
-### 5a. Critérios de aceite da feature
+- [ ] **AC01 — [critério observável ou limiar específico]**
+  - **Razão de negócio:** [por que importa, ou —]
+  - **Como verificar:** [verificação externa]
 
-Critérios **funcionais e não-funcionais específicos desta feature**, cada um como
-limiar observável. NFR específico da feature (tempo de resposta, disponibilidade,
-capacidade) entra aqui quando tem razão de negócio — registre o limiar **e o porquê**.
-NFR global do projeto (p95 geral, uptime, criptografia) mora no TRD, não aqui.
-
-| Critério | Razão de negócio | Como verificar (observável) |
-|----------|------------------|-----------------------------|
-| [ex.: confirmação de pagamento responde < 2s] | [acima disso o usuário reenvia e duplica a cobrança] | [como testar de fora] |
-| [ex.: fluxo X funciona para persona Y] | — | [como testar] |
+[IDs `ACxx` são estáveis. Marcar o item somente após aprovação. Todos precisam estar
+marcados para `status: concluido`.]
 
 ### 5b. Métricas de sucesso
 
 | Métrica | Baseline (fonte) | Meta | Prazo | Mín. aceitável | Responsável |
-|---------|-------------------|------|-------|-----------------|-------------|
-| [nome] | [valor atual + de onde vem o dado] | [valor alvo] | [data ou período] | [threshold abaixo do qual a entrega falhou] | [quem mede] |
+|---|---|---|---|---|---|
+| [nome] | [valor e origem, ou A levantar] | [alvo] | [data/período] | [limiar] | [papel/pessoa] |
 
-**Regras:**
-- Baseline sem fonte confiável deve ser marcado como "A levantar" com responsável e prazo para obtenção
-- Mín. aceitável define o ponto de corte entre sucesso e fracasso — sem ele, a meta é aspiracional, não um critério de aceite
-
-## 6. Milestones
-
-### Milestone 1: [Verbo + Substantivo]
-
-**Por que é um marco:** [o que o usuário ganha; por que se anuncia como conquista.]
-
-**Funcionalidades:** US01, US02
-
-**Checklist de aceite** (marcado pelo Aprovador após a implementação):
-- [ ] [critério observável de §5a, filtrado pelas USs deste marco]
-- [ ] [critério observável de §5a, filtrado pelas USs deste marco]
-
-**Aprovador:** [quem dá o OK — papel ou pessoa]
-
-### Milestone 2: [Verbo + Substantivo]
-
-**Por que é um marco:** [uma frase.]
-
-**Funcionalidades:** US03
-
-**Checklist de aceite** (marcado pelo Aprovador após a implementação):
-- [ ] [critério observável de §5a, filtrado pelas USs deste marco]
-
-**Aprovador:** [quem dá o OK — papel ou pessoa]
-
-[Um milestone é um **marco de produto**: um conjunto coeso de funcionalidades que entrega
-algo ao usuário — algo que se anuncia como conquista, não uma fatia de execução. Definido por
-**quais USs cobre**, por uma **justificativa de por que é um marco** (auto-avaliação: se sai
-forçada, é tarefa disfarçada ou dois marcos espremidos) e por um **checklist de aceite**
-(critérios de §5a filtrados pelas USs, marcáveis pelo Aprovador). **Sem número mínimo**; o teto
-de ~6 é sinal de que talvez sejam várias features (ver §2a). A decomposição em tarefas técnicas
-(passos, validação, ordem de execução) e o dimensionamento do artefato de execução são do
-SPEC/TASKS, gerados pelo `sdd-especificar` — não detalhar nem dirigir isso aqui.]
-
-## 7. Riscos e Dependências
+## 6. Riscos e dependências
 
 | Risco | Impacto | Mitigação | Status |
-|-------|---------|-----------|--------|
-| [risco de negócio, produto ou adoção] | Alto/Médio/Baixo | [plano de mitigação] | Pendente/Monitorando/Mitigado |
+|---|---|---|---|
+| [risco de negócio, produto ou adoção] | Alto/Médio/Baixo | [mitigação] | Pendente/Monitorando/Mitigado |
 
 **Dependências:**
 
-| Dependência | Tipo | Status | Impacto se bloqueado |
-|-------------|------|--------|----------------------|
-| [outra feature/PRD, equipe, decisão de produto] | Interna/Externa | [estado atual] | [quais milestones são afetados] |
+| Dependência | Tipo | Status | Impacto se bloqueada |
+|---|---|---|---|
+| [PRD, equipe ou decisão de produto] | Interna/Externa | [estado] | [critérios afetados] |
 
-[Dependência técnica de infra/serviço com SLA ou rate limit é contexto técnico
-global → TRD. Aqui ficam dependências no nível de negócio/entrega.]
+[Dependência técnica global pertence ao TRD.]
 
-## 8. Referências
+## 7. Referências
 
-- [Descrição do recurso](link) — [por que é relevante]
-- [Descrição do recurso](link) — [por que é relevante]
+- [Recurso](link) — [relevância]
 
-[Links para documentação, issues, PRDs relacionados, ADRs que embasam a feature,
-designs, ou qualquer recurso externo relevante para o negócio da feature.]
+## 8. Registro de decisões
 
-## 9. Registro de Decisões
-
-- **[YYYY-MM-DD]:** [Decisão de produto tomada]. Motivo: [por que essa escolha foi feita].
-
-[Registra decisões **de produto** e premissas de negócio significativas. Decisão
-técnica/arquitetural vai para ADR, não aqui. Seção viva durante `rascunho`, `pronto`
-e `em-progresso`; congela junto com o PRD quando o status vira `concluido`.]
+- **YYYY-MM-DD:** [decisão de produto]. Motivo: [justificativa].
 ```
+
+## Compatibilidade com PRDs legados
+
+Um PRD existente que contenha `## 6. Milestones` permanece no formato anterior. Ao editá-lo,
+preserve a seção, os IDs, checklists, aprovadores e a regra de conclusão histórica; não aplique
+retroativamente a renumeração deste template sem pedido explícito de migração.

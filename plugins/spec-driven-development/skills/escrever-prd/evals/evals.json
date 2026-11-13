@@ -1,70 +1,175 @@
 {
   "skill_name": "escrever-prd",
-  "notes": "Foco: validar a nova regra de granularidade. O caso-chave é o portal encadeado (eval 1) — domínios dependentes entre si que os três sinais antigos ('sem dependência', 'qualquer ordem', 'sem encadeamento') reprovavam como um PRD único, e que a trava nova ('cada parte se explica sozinha e entrega algo ao usuário?') deve splitar. Eval 2 é o guarda contra super-divisão. Eval 3 valida a semântica de milestone como marco de produto (justificativa + checklist, sem piso).",
+  "notes": "Valida o roteamento Epic/PRD, o hard gate de um artefato por execução, a ausência de milestones em PRDs novos, a compatibilidade legada e as operações de Epic sem geração prematura de PRDs.",
   "evals": [
     {
       "id": 1,
-      "name": "portal-encadeado-splita",
-      "prompt": "Quero especificar os requisitos do meu portal de conteúdo próprio, single-tenant (só a minha marca). Preciso cobrir: cadastro gratuito e login dos alunos, com papéis no backoffice (admin e autor); um modelo de conteúdo em árvore (formação → módulo → capítulo → aula, e também aula solta e artigo), com editor de texto, anexos, fluxo rascunho→publicado e posse do conteúdo por autor; controle de acesso — cada nó é público, cadastro-grátis ou restrito, e para ver conteúdo restrito o aluno precisa de um direito (compra vitalícia, assinatura ativa ou concessão externa); a página de consumo da aula, com player, registro de progresso e navegação livre pela trilha; e distribuição do texto como blog e como newsletter. Monta o PRD disso.",
-      "expected_output": "A skill NÃO gera um PRD monolítico. Reconhece que o input cobre múltiplas features (identidade, modelo de conteúdo/editorial, acesso/entitlement, consumo, distribuição) e propõe split em PRDs separados — apesar de os domínios serem dependentes/encadeados entre si. A justificativa do split apoia-se em auto-suficiência ('cada parte se explica e entrega algo ao usuário'), não em ausência de dependência, e trata a dependência como algo que vive no depends_on.",
+      "name": "epic-explicita-alto-nivel",
+      "prompt": "Crie uma Epic para reduzir abandono no onboarding. Queremos entender ativação, orientação inicial e recuperação de usuários travados, mas ainda estamos pesquisando quais features serão necessárias.",
+      "expected_output": "Cria somente uma Epic E001 em docs/epics, com status explorando, capacidades candidatas e milestones de resultado. Não cria PRDs, User Stories detalhadas, rules ou edge cases.",
       "files": [],
       "assertions": [
         {
-          "text": "Propõe dividir o input em múltiplos PRDs (não gera um único PRD cobrindo tudo)",
+          "text": "Seleciona explicitamente o fluxo Epic e trabalha em um único artefato",
           "type": "qualitative"
         },
         {
-          "text": "NÃO justifica o split por 'ausência de dependência', 'independência entre os domínios', 'entregáveis em qualquer ordem' ou 'sem encadeamento' (os sinais antigos)",
+          "text": "A Epic começa em status explorando e usa capacidades Cxx e milestones Mxx de resultado",
           "type": "qualitative"
         },
         {
-          "text": "Reconhece explicitamente que os PRDs propostos são dependentes/encadeados entre si e que isso é normal (menciona depends_on, encadeamento, ou que dependência não impede o corte)",
+          "text": "Não cria nem promete criar PRDs na mesma execução",
           "type": "qualitative"
         },
         {
-          "text": "Justifica o split por auto-suficiência: cada parte proposta se explica sozinha e entrega algo observável ao usuário",
+          "text": "Não transforma as capacidades em User Stories, rules, edge cases ou tarefas",
           "type": "qualitative"
         }
       ]
     },
     {
       "id": 2,
-      "name": "feature-coesa-nao-superdivide",
-      "prompt": "Preciso documentar os requisitos da feature de autenticação por magic link do meu app. O usuário informa o email, recebe um link, clica e entra sem senha. Precisa cobrir: primeiro acesso cria a conta automaticamente, acessos seguintes apenas autenticam, o link expira em 15 minutos e é de uso único, e tem rate limit por email para não virar vetor de spam. Gera o PRD.",
-      "expected_output": "A skill gera UM único PRD para a feature de login por magic link. As partes descritas (criar conta no 1º acesso, autenticar, expiração, uso único, rate limit) viram Rules/US/milestones DENTRO do PRD — não PRDs separados. Elas não passam no teste de auto-suficiência como features próprias (nenhuma entrega valor observável sozinha, separada do login).",
+      "name": "portal-amplo-vira-candidato-a-epic",
+      "prompt": "Quero um PRD para meu portal de conteúdo: identidade de alunos e autores, modelo editorial em árvore, entitlement de compra ou assinatura, consumo com progresso e distribuição por blog e newsletter. Monta tudo.",
+      "expected_output": "Não gera um PRD monolítico nem vários PRDs. Reconhece features autocontidas ligadas pelo resultado comum do portal, propõe trabalhar primeiro no nível da Epic e aguarda confirmação.",
       "files": [],
       "assertions": [
         {
-          "text": "Gera um único PRD (não propõe split em múltiplos PRDs)",
+          "text": "Classifica o conjunto como possível Epic por compartilhar um resultado agregador",
           "type": "qualitative"
         },
         {
-          "text": "As partes (criar conta, autenticar, expiração/uso único, rate limit) aparecem como US/Rules/milestones dentro do PRD, não como features separadas",
+          "text": "Não gera PRD monolítico, PRDs filhos nem arquivos antes da confirmação",
+          "type": "qualitative"
+        },
+        {
+          "text": "Não usa dependência entre as features como motivo para mantê-las no mesmo PRD",
           "type": "qualitative"
         }
       ]
     },
     {
       "id": 3,
-      "name": "milestone-como-marco-sem-piso",
-      "prompt": "Quero um PRD para uma feature pequena: exportar o histórico de pedidos do cliente em CSV. O cliente clica em 'exportar', o sistema gera um CSV com os pedidos dos últimos 12 meses e faz o download no navegador. Se o cliente não tiver pedidos no período, mostra um aviso em vez de baixar um arquivo vazio. Gera o PRD com os milestones.",
-      "expected_output": "PRD de uma feature pequena. Os milestones são marcos de produto (o que o cliente ganha), cada um com uma justificativa de por que é um marco e um checklist de aceite marcável. A skill NÃO força um mínimo de 3 milestones para uma feature pequena — 1 ou 2 marcos legítimos são aceitáveis. Os milestones não contêm tarefas técnicas nem ordem de execução.",
+      "name": "feature-coesa-gera-prd-v4",
+      "prompt": "Crie o PRD de autenticação por magic link. Primeiro acesso cria a conta, o link expira em 15 minutos, é de uso único e existe rate limit por email.",
+      "expected_output": "Gera um único PRD. Criação de conta, expiração, uso único e rate limit permanecem como regras/edge cases da feature. O PRD não tem milestones e usa critérios ACxx com checkboxes.",
       "files": [],
       "assertions": [
         {
-          "text": "Cada milestone tem uma justificativa de 'por que é um marco' (o que o usuário ganha)",
+          "text": "Gera um único PRD para magic link",
           "type": "qualitative"
         },
         {
-          "text": "Cada milestone tem um checklist de aceite com itens marcáveis (checkboxes), derivado dos critérios de aceite",
+          "text": "Mantém expiração, uso único e rate limit dentro do PRD, sem superdivisão",
           "type": "qualitative"
         },
         {
-          "text": "NÃO força um mínimo de 3 milestones nem inventa marcos para bater cota — a quantidade acompanha o tamanho real da feature",
+          "text": "Não cria seção Milestones e usa critérios ACxx com checkbox de aprovação",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "features-sem-objetivo-comum",
+      "prompt": "Documente login por magic link, exportação CSV de pedidos e tema escuro. Pode criar os requisitos.",
+      "expected_output": "Reconhece três features sem resultado agregador real, propõe PRDs separados e pede que o usuário escolha uma. Não cria uma Epic artificial nem gera os PRDs em sequência.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Propõe PRDs separados para as três features",
           "type": "qualitative"
         },
         {
-          "text": "Os milestones não contêm tarefas técnicas, passos de implementação nem ordem de execução (isso é do preparar-execucao)",
+          "text": "Não cria Epic apenas para agrupar demandas independentes",
+          "type": "qualitative"
+        },
+        {
+          "text": "Aguarda seleção e não gera vários documentos na mesma execução",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "decomposicao-epic-sem-escrita",
+      "prompt": "Proponha como decompor a Epic E001, sem criar arquivos. Resumo da Epic: objetivo de reduzir abandono no onboarding; C01 orientação inicial (clara), C02 recuperação de usuário travado (research), C03 ativação guiada (design); M01 usuário conclui a configuração inicial e M02 usuário travado consegue retomar. Não quero criar os PRDs ainda.",
+      "expected_output": "Apresenta em conversa uma tabela de capacidades, possíveis artefatos, clareza e próximo passo. Não altera a Epic, não cria mapa separado, não numera PRDs e não escreve em docs/prds.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Produz somente uma proposta de decomposição em conversa",
+          "type": "qualitative"
+        },
+        {
+          "text": "Não modifica a Epic nem cria arquivos",
+          "type": "qualitative"
+        },
+        {
+          "text": "Não atribui números de PRD antecipadamente",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "prd-com-origem-opcional",
+      "prompt": "Crie somente o PRD da capacidade C02 da Epic E001. A capacidade é: permitir que um usuário travado retome o onboarding do último passo concluído, sem perder respostas já salvas. As demais capacidades ficam para depois.",
+      "expected_output": "Cria um único PRD e registra origin_epic E001 e origin_capability C02. Não usa a Epic em depends_on, não altera a Epic e não cria PRDs para capacidades irmãs.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Registra a proveniência explícita em origin_epic e origin_capability",
+          "type": "qualitative"
+        },
+        {
+          "text": "Não trata a Epic como depends_on e não a atualiza",
+          "type": "qualitative"
+        },
+        {
+          "text": "Cria apenas o PRD solicitado",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "edicao-prd-legado-preserva-milestones",
+      "prompt": "Edite o PRD legado em fixtures/prd-legado-003.md sem migrá-lo. Acrescente à US02 o edge case 'convite expirado → informar expiração e permitir reenvio'. Preserve todo o restante.",
+      "expected_output": "Edita somente o edge case e preserva integralmente milestones, IDs, checklists, aprovadores, número, nome e status. Não cria milestones novos nem converte o documento para ACxx implicitamente.",
+      "files": ["fixtures/prd-legado-003.md"],
+      "assertions": [
+        {
+          "text": "Preserva milestones e seus identificadores no PRD legado",
+          "type": "qualitative"
+        },
+        {
+          "text": "Não migra critérios ou milestones sem pedido explícito",
+          "type": "qualitative"
+        },
+        {
+          "text": "Preserva prd_number, arquivo e status",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "status-epic-explicito-e-imutavel",
+      "prompt": "A Epic E001 está planejada. Marque-a como em progresso. Depois considere o caso de alguém pedir para editar uma Epic concluída.",
+      "expected_output": "Faz somente a transição explicitamente pedida de planejada para em-progresso. Explica que concluída é imutável e que resultado posterior exige nova Epic referenciando a anterior.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Transiciona status apenas por solicitação explícita e respeita a ordem do ciclo",
+          "type": "qualitative"
+        },
+        {
+          "text": "Recusa edição de Epic concluída",
+          "type": "qualitative"
+        },
+        {
+          "text": "Orienta criar nova Epic para direção posterior",
           "type": "qualitative"
         }
       ]

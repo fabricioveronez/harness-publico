@@ -2,7 +2,7 @@
   "name": "fabricio-marketplace-publico",
   "owner": { "name": "Fabricio Veronez", "email": "fabricio@veronez.io" },
   "plugins": [
-    { "name": "spec-driven-development", "source": "./plugins/spec-driven-development", "description": "Fluxo spec-driven para software: escrever PRD e TRD" },
+    { "name": "spec-driven-development", "source": "./plugins/spec-driven-development", "description": "Fluxo spec-driven para software: escrever Epic, PRD e TRD" },
     { "name": "uso-geral",               "source": "./plugins/uso-geral",               "description": "Brainstorm e maturação de ideias antes de especificar ou implementar" }
   ]
 }

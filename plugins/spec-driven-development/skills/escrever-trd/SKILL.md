@@ -316,7 +316,7 @@ disciplina da imutabilidade do PRD `concluido`.
 
 Esta skill **não**:
 
-- Cria PRDs (papel de `escrever-prd`)
+- Cria Epics ou PRDs (papel de `escrever-prd`)
 - Gera SPEC, PLAN ou TASKS (papel do `sdd-especificar`)
 - Cria ADRs fora do Modo Decision — nos modos Criação e Edição apenas referencia os ADRs já existentes em `docs/adrs/`; a criação de ADR é exclusiva do Modo Decision
 - Toma decisões de negócio — lacunas são devolvidas ao usuário

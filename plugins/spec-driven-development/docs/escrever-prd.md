@@ -1,109 +1,100 @@
 # escrever-prd
 
-Cria e edita PRDs (Product Requirements Documents) — o **documento humano** da feature, fonte
-de verdade da intenção de produto. Trabalha em modo **draft-first**: gera o documento completo
-imediatamente a partir do que o usuário fornecer, marcando as premissas inferidas inline
-(`*(premissa — confirme ou corrija)*`) para revisão pontual, em vez de conduzir entrevista
-longa. O PRD cobre problema, solução de produto, escopo, funcionalidades (User Stories com
-Rules e Edge cases), critérios de aceite e métricas, fluxo de negócio e milestones.
+Cria e edita dois artefatos de produto com fluxos separados por progressive disclosure:
 
-Um PRD é uma **unidade de raciocínio de produto**: o conjunto de comportamento e regras cujas
-decisões se explicam juntas. Quando o input cobre mais de uma feature, a skill **detecta e
-propõe um split** em PRDs separados antes de gerar qualquer coisa, e cria os PRDs restantes em
-sequência na mesma sessão. Além de especificar, o PRD é o **controle de estado** da feature,
-via campo `status` e grafo de `depends_on`.
+- **Epic** — visão de alto nível para research, direção, capacidades candidatas e milestones
+  de resultado.
+- **PRD** — especificação autocontida do comportamento e das regras de uma feature.
 
-Detalhe técnico (stack, arquitetura, NFR global) fica no TRD; decisão arquitetural durável vira
-ADR — a skill sinaliza e sugere registrar via `escrever-trd` (Modo Decision).
+A skill seleciona um único fluxo por execução. Criar uma Epic não gera seus PRDs;
+decompor uma Epic apenas apresenta candidatos em conversa; criar um PRD posterior exige uma
+nova solicitação explícita.
 
-## Pré-requisitos e configuração
+## Quando usar Epic
 
-- Nenhuma configuração prévia. Basta uma descrição do que se quer construir (problema,
-  ideia de solução, restrições conhecidas).
-- **Modo edição** — a skill lê o PRD referenciado em `./docs/prds/`, verifica o `status` e
-  preserva `prd_number`, nome do arquivo, `status` atual e os IDs de US e Milestone já
-  atribuídos. USs novas recebem o próximo ID sequencial.
-- **Local e nome do arquivo** — `./docs/prds/NNN-nome-em-kebab-case.md` (ex.:
-  `003-autenticacao-oauth.md`). O número é sequencial, determinado varrendo o diretório, e
-  gravado no campo `prd_number` do frontmatter. O diretório é criado se não existir; outro
-  caminho pode ser informado pelo usuário.
-- **Estrutura gerada** — segue `references/template-prd.md`, que também define o vocabulário de
-  `status`: `rascunho | pronto | em-progresso | concluido`.
+Use para uma iniciativa, MVP, visão ou resultado amplo que pode envolver várias capacidades.
+A Epic pode existir sem nenhum PRD e permanece útil enquanto a decomposição ainda muda.
 
-## Dependências externas
+O documento registra:
 
-Nenhuma. A skill trabalha só com arquivos markdown do próprio projeto.
+- problema, público e evidências;
+- resultados e métricas agregadas;
+- fronteira;
+- capacidades candidatas `Cxx` e seu grau de clareza;
+- milestones de resultado `Mxx`;
+- sequenciamento, decisões e questões abertas.
 
-## Skills relacionadas
+Local padrão: `docs/epics/E###-nome-em-kebab-case.md`. O ciclo é
+`explorando → planejada → em-progresso → concluida`; toda transição precisa ser solicitada e
+uma Epic concluída é imutável.
 
-- **preparar-execucao** — o passo seguinte: projeta o `SPEC.md` a partir do PRD e gera o bundle
-  de execução. É ela quem consome o PRD `pronto`.
-- **revisao-documento-tecnico** — revisa o PRD antes de partir para a execução.
-- **escrever-trd** — dona do TRD e dos ADRs. Decisão arquitetural durável identificada no input
-  do PRD é roteada para o Modo Decision dela (`docs/adrs/`); o PRD apenas referencia em §8.
-- **validar-implementacao** — fecha o ciclo e promove o `status` do PRD para `concluido`.
-  Nenhuma outra skill edita o corpo do PRD.
-- **brainstorm** — madurar a ideia antes de formalizar com `escrever-prd`.
-- **banco-de-ideias** — registrar a ideia no Notion antes de escrever o PRD formal.
+## Quando usar PRD
 
-## Exemplos de uso
+Use quando a demanda já representa uma feature autocontida. O PRD contém contexto, solução de
+produto, fora do escopo, User Stories, Rules, Edge cases, fluxo de negócio quando necessário,
+critérios de aceite, métricas, riscos, dependências, referências e decisões.
 
-```
-Quero criar um PRD para um sistema de autenticação com SSO
+Local padrão: `docs/prds/NNN-nome-em-kebab-case.md`. O ciclo continua
+`rascunho | pronto | em-progresso | concluido`.
 
-Cria um documento de requisitos para uma API de pagamentos
+PRDs novos não possuem milestones. Os critérios recebem IDs estáveis `ACxx` e um checkbox de
+aprovação; todos devem estar aprovados para a feature ser considerada concluída. A skill não
+promove o status automaticamente.
 
-Preciso planejar uma feature de notificações em tempo real para o nosso app
+## Granularidade
 
-Criar PRD: plataforma de agendamento de consultas médicas online
+- Várias features autocontidas com um resultado comum formam uma possível Epic.
+- Features sem resultado agregador são candidatas a PRDs separados.
+- Rules, expiração, rate limit, exceções e controles que apenas tornam uma feature correta
+  permanecem no mesmo PRD.
+- Dependência entre features não impede o corte; dependências diretas vivem em `depends_on`.
 
-Ajusta o PRD 003 para incluir o fluxo de convite por e-mail
+Quando houver mais de um PRD possível, a skill apresenta o corte e espera o usuário escolher
+um. Ela não cria documentos em sequência.
 
-Refinar o PRD de pagamentos: faltou o edge case de reembolso parcial
+## Relação opcional
 
-Esse PRD está grande demais? Avalia a granularidade e me diz se vale quebrar
+Um PRD criado posteriormente pode registrar:
+
+```yaml
+origin_epic: "E001"
+origin_capability: "C01"
 ```
 
-### Como funciona (resumo)
+Esses campos indicam proveniência e só aparecem quando a origem foi fornecida explicitamente.
+Não são dependências, não sincronizam status e não provocam atualização da Epic. A Epic não
+mantém lista obrigatória de PRDs.
 
-1. **Modo** — detecta criação vs. edição (referência a um PRD existente = edição).
-2. **Análise de escopo** — detecta múltiplas features e **propõe o split** ("Detectei 3
-   features… Começamos pelo PRD-A?"), aguardando confirmação. Só interrompe com pergunta quando
-   há lacuna **bloqueante** (algo impossível de inferir); o resto é inferido e marcado.
-3. **Draft** — gera o PRD completo de uma vez, com as premissas marcadas inline.
-4. **Dependências** — varre `./docs/prds/`, avalia dependência real e específica com cada PRD
-   existente e preenche `depends_on` no frontmatter, registrando o critério no Registro de
-   Decisões.
-5. **Refinamento** — aplica as correções do usuário até a aprovação (reavaliando `depends_on` se
-   o escopo mudou).
-6. **Salvar** — numera, nomeia e grava.
-7. **Continuidade multi-PRD** — se havia split pendente, oferece seguir para o próximo PRD,
-   reaproveitando as decisões do anterior como contexto.
+## Compatibilidade
 
-## Limitações conhecidas
+- PRDs existentes com milestones permanecem no formato legado.
+- Ao editá-los, a skill preserva milestones, IDs, checklists e semântica de conclusão.
+- Nenhum milestone novo é adicionado e nenhuma migração implícita acontece.
+- PRDs e Epics concluídos são imutáveis; mudanças posteriores abrem novo artefato.
 
-- **PRDs com `status: concluido` são imutáveis** — a skill interrompe no modo edição. Mudança
-  de comportamento posterior abre um **novo** PRD, que pode referenciar o antigo.
-- **Não transiciona `status`** — no modo criação salva sempre como `rascunho`; no modo edição
-  preserva o status atual. As transições para `pronto`, `em-progresso` e `concluido` são das
-  skills de preparação, execução e validação.
-- **Não cobre o técnico** — stack, arquitetura, padrões e NFR global ficam no TRD; decisão
-  arquitetural durável vira ADR. A skill **gera** o Fluxo de Negócio (§4, diagrama de jornada
-  onde os pontos de decisão são regras) quando a ramificação não fica clara no texto, mas nunca
-  topologia técnica (componentes, serviços, modelo de dados) — isso é o "Diagrama de
-  Implementação" do PLAN.
-- **Não decompõe em tasks** — milestone é **marco de produto** (conjunto coeso de USs que
-  entrega algo anunciável), não fatia de execução. Passos, validação e ordem são do
-  `preparar-execucao`. Não há número mínimo de milestones; **mais de ~6 é o sinal de que são
-  várias features** e o corte deve ser reavaliado.
-- **IDs são estáveis** — US01, US02, Milestone 1… não mudam depois de atribuídos, porque os
-  artefatos seguintes referenciam por eles.
-- Critérios de sucesso vagos ("deve funcionar bem", "boa performance") são reformulados até
-  ficarem verificáveis ou marcados como premissa — não passam como estão.
-- A qualidade do documento depende da riqueza do input: quanto mais contexto, menos premissas
-  a revisar.
+## Limites
 
-### Referências da skill
+- Stack, arquitetura e NFR global ficam no TRD.
+- Decisão técnica durável vira ADR.
+- PLAN/TASKS cuidam da decomposição e ordem técnica.
+- Decomposição de Epic não cria arquivos.
+- Uma execução nunca cria ou edita Epic e PRD juntos.
 
-- `references/template-prd.md` — estrutura canônica do PRD, vocabulário de `status` e
-  semântica dos milestones.
+## Exemplos
+
+```text
+Crie uma Epic para reduzir abandono no onboarding.
+
+Analise a Epic E001 e proponha possíveis PRDs, sem criar arquivos.
+
+Crie o PRD da capacidade C02 da Epic E001.
+
+Crie um PRD para login por magic link.
+
+Ajuste o PRD 003 para cobrir reembolso parcial.
+```
+
+## Referências internas
+
+- `references/fluxo-epic.md` e `references/template-epic.md` — fluxo e formato de Epic.
+- `references/fluxo-prd.md` e `references/template-prd.md` — fluxo e formato de PRD.
