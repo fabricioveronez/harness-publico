@@ -4,6 +4,6 @@
   "plugins": [
     { "name": "spec-driven-development", "source": "./plugins/spec-driven-development", "description": "Fluxo spec-driven para software: brainstorm de sistemas e escrever Epic, PRD e TRD" },
     { "name": "uso-geral",               "source": "./plugins/uso-geral",               "description": "Brainstorm e maturação de ideias antes de especificar ou implementar" },
-    { "name": "devops",                  "source": "./plugins/devops",                  "description": "Boas práticas para Docker e Kubernetes" }
+    { "name": "devops",                  "source": "./plugins/devops",                  "description": "Boas práticas para Docker e Kubernetes e pipelines do GitHub Actions" }
   ]
 }

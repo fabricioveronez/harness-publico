@@ -43,6 +43,7 @@ A skill instrui o LLM a puxar reference sob demanda baseado no cenário:
 ## Skills relacionadas
 
 - **kubernetes-practices** — imagens construídas seguindo estas práticas rodam bem em K8s
+- **pipeline-github-actions** — build e push de imagens em workflows de CI
 
 ## Exemplos de uso
 

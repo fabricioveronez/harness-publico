@@ -1,7 +1,7 @@
 {
   "name": "devops",
-  "version": "1.0.0",
-  "description": "Boas práticas para Docker e Kubernetes",
+  "version": "1.1.0",
+  "description": "Boas práticas para Docker e Kubernetes e pipelines do GitHub Actions",
   "author": {
     "name": "Fabricio Veronez",
     "email": "fabricio@veronez.io"

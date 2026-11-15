@@ -36,6 +36,7 @@ O `SKILL.md` cobre o "o que fazer" (regras prescritivas). Os references explicam
 ## Skills relacionadas
 
 - **docker-practices** — imagens seguem práticas compatíveis com execução em pods
+- **pipeline-github-actions** — deploy de manifests via pipeline de CI/CD
 
 ## Exemplos de uso
 
